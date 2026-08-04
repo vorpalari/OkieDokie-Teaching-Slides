@@ -212,6 +212,45 @@ svg{display:block;}
 .confirm-text{font-size:14.5px;font-weight:700;line-height:1.5;color:var(--ink);margin-bottom:20px;}
 .confirm-foot{display:flex;justify-content:flex-end;gap:10px;}
 
+/* ---------- rich text fields ---------- */
+.color-toolbar{position:sticky;top:0;background:#fff;z-index:8;display:flex;align-items:center;gap:8px;padding:8px 0 14px;margin-bottom:6px;border-bottom:2px solid var(--cream);}
+.ct-label{font-size:11.5px;font-weight:800;color:var(--ink-soft);margin-right:2px;}
+.ct-swatch{width:24px;height:24px;border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 2px var(--card-border);}
+.ct-swatch:hover{box-shadow:0 0 0 2px var(--ink-soft);}
+.ct-clear{width:auto;padding:0 10px;font-size:11px;font-weight:800;color:var(--ink-soft);background:var(--cream);box-shadow:none;border-radius:8px;}
+.rich-field{width:100%;padding:11px 13px;border-radius:12px;border:2px solid var(--card-border);font-size:14px;font-family:'Nunito',sans-serif;font-weight:700;color:var(--ink);white-space:pre-wrap;min-height:70px;outline:none;}
+.rich-field:focus{border-color:var(--navy);}
+.rich-field:empty:before{content:attr(data-placeholder);color:#a3a3b5;font-weight:600;}
+.rich-field.item-field{min-height:44px;flex:1;}
+.item-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.item-row{display:flex;gap:8px;align-items:flex-start;}
+.item-del{width:36px;height:36px;flex-shrink:0;border-radius:10px;background:var(--cream);color:var(--pink-deep);display:flex;align-items:center;justify-content:center;}
+.item-del:hover{background:var(--pink);}
+.btn-sm{padding:8px 14px;font-size:12.5px;}
+.chip-input-row{display:flex;gap:8px;margin-bottom:10px;}
+.chip-input-row input{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13.5px;font-weight:700;min-width:0;}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px;}
+.chip-tag{display:inline-flex;align-items:center;gap:6px;background:var(--cream);border-radius:10px;padding:6px 6px 6px 12px;font-size:12.5px;font-weight:800;color:var(--ink);}
+.chip-remove{width:18px;height:18px;border-radius:6px;background:rgba(0,0,0,.06);color:var(--ink-soft);font-size:13px;display:flex;align-items:center;justify-content:center;}
+.chip-remove:hover{background:var(--pink);color:var(--pink-deep);}
+
+/* ---------- slide chip pills (rendered on slide) ---------- */
+.chips-row{display:flex;flex-wrap:wrap;gap:1.8cqw;}
+.chip-pill{background:#fff;border:.35cqw solid var(--accent);color:var(--accent);border-radius:1.8cqw;padding:1.6cqw 3.2cqw;font-size:3cqw;font-weight:800;box-shadow:0 .6cqw 1.2cqw rgba(35,25,55,.05);}
+
+/* ---------- full screen viewer ---------- */
+.viewer-overlay{position:fixed;inset:0;background:rgba(20,15,32,.94);display:none;align-items:center;justify-content:center;gap:22px;z-index:2000;padding:30px;}
+.viewer-overlay.show{display:flex;}
+.viewer-slide-wrap{width:min(88vw, calc(82vh * 4 / 3));display:flex;flex-direction:column;gap:12px;align-items:center;}
+.viewer-slide-wrap .slide-canvas{width:100%;aspect-ratio:4/3;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.viewer-counter{color:#fff;font-weight:800;font-size:13px;opacity:.65;}
+.viewer-close{position:absolute;top:24px;right:26px;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.viewer-close:hover{background:rgba(255,255,255,.22);}
+.viewer-nav{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.viewer-nav:hover{background:rgba(255,255,255,.22);}
+.viewer-nav:disabled{opacity:.2;cursor:default;}
+.viewer-nav:disabled:hover{background:rgba(255,255,255,.12);}
+
 /* ---------- print ---------- */
 #printArea{display:none;}
 @media print{
@@ -329,6 +368,17 @@ svg{display:block;}
 
 <div id="printArea"></div>
 
+<!-- Full screen viewer -->
+<div class="viewer-overlay" id="viewerOverlay">
+  <button class="viewer-close" id="viewerClose">&times;</button>
+  <button class="viewer-nav" id="viewerPrev">&lsaquo;</button>
+  <div class="viewer-slide-wrap">
+    <div class="slide-canvas" id="viewerCanvas"></div>
+    <div class="viewer-counter" id="viewerCounter"></div>
+  </div>
+  <button class="viewer-nav" id="viewerNext">&rsaquo;</button>
+</div>
+
 <script>
 (function(){
 "use strict";
@@ -413,6 +463,39 @@ function escapeHtml(str){
     .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 function nl2br(str){ return escapeHtml(str).replace(/\n/g,"<br>"); }
+function sanitizeRichHtml(html){
+  if(!html) return "";
+  var allowed = { SPAN:1, BR:1, DIV:1 };
+  var holder = document.createElement("div");
+  holder.innerHTML = html;
+  (function clean(node){
+    Array.prototype.slice.call(node.childNodes).forEach(function(child){
+      if(child.nodeType === 1){
+        if(!allowed[child.tagName]){
+          while(child.firstChild){ node.insertBefore(child.firstChild, child); }
+          node.removeChild(child);
+          return;
+        }
+        if(child.tagName === "DIV"){
+          // contenteditable sometimes wraps lines in DIVs on Enter; treat as a line break
+          var br = document.createElement("br");
+          node.insertBefore(br, child);
+          while(child.firstChild){ node.insertBefore(child.firstChild, child); }
+          node.removeChild(child);
+          return;
+        }
+        var keepStyle = null;
+        if(child.tagName === "SPAN" && child.style && child.style.color){
+          keepStyle = "color:" + child.style.color;
+        }
+        Array.prototype.slice.call(child.attributes).forEach(function(attr){ child.removeAttribute(attr.name); });
+        if(keepStyle) child.setAttribute("style", keepStyle);
+        clean(child);
+      }
+    });
+  })(holder);
+  return holder.innerHTML;
+}
 function splitLines(str){
   return String(str||"").split("\n").map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
 }
@@ -518,7 +601,7 @@ function renderMain(){
         '<button class="icon-btn edit-btn" title="Edit" data-edit="' + sl.id + '">' + icon("edit",13) + '</button>' +
         '<button class="icon-btn del-btn" title="Delete" data-delslide="' + sl.id + '">' + icon("trash",13) + '</button>' +
       '</div>' +
-      '<div class="slide-canvas theme-' + sl.color + '" data-edit="' + sl.id + '">' + renderSlideInner(sl, topic) + '</div>' +
+      '<div class="slide-canvas theme-' + sl.color + '" data-view="' + sl.id + '">' + renderSlideInner(sl, topic) + '</div>' +
       '<div class="card-foot"><span>' + TEMPLATES[sl.template].name + '</span></div>' +
     '</div>';
   });
@@ -540,16 +623,20 @@ function renderSlideInner(sl, topic){
   if(sl.template === "lesson"){
     var blocks = "";
     if(sl.tryItOut){
-      blocks += '<div class="card-block"><div class="card-label">Try it out</div><div class="card-text">' + nl2br(sl.tryItOut) + '</div></div>';
+      blocks += '<div class="card-block"><div class="card-label">Try it out</div><div class="card-text">' + sanitizeRichHtml(sl.tryItOut) + '</div></div>';
     }
     if(sl.body){
-      blocks += '<div class="card-block"><div class="card-label">Rule</div><div class="card-text">' + nl2br(sl.body) + '</div></div>';
+      blocks += '<div class="card-block"><div class="card-label">Rule</div><div class="card-text">' + sanitizeRichHtml(sl.body) + '</div></div>';
     }
     var exs = sl.examples || [];
     if(exs.length){
       blocks += '<div class="examples-row">' + exs.map(function(e,i){
-        return '<div class="example-card"><div class="example-num">' + (i+1) + '</div><div class="example-text">' + nl2br(e) + '</div></div>';
+        return '<div class="example-card"><div class="example-num">' + (i+1) + '</div><div class="example-text">' + sanitizeRichHtml(e) + '</div></div>';
       }).join("") + '</div>';
+    }
+    var chips = sl.chips || [];
+    if(chips.length){
+      blocks += '<div class="chips-row">' + chips.map(function(w){ return '<span class="chip-pill">' + escapeHtml(w) + '</span>'; }).join("") + '</div>';
     }
     return '<div class="slide-inner">' + decoBg() +
       '<div class="hero-card"><div class="eyebrow">' + eyebrow + '</div>' +
@@ -567,13 +654,13 @@ function renderSlideInner(sl, topic){
     return '<div class="slide-inner">' + decoBg() +
       '<div class="hero-card"><div class="eyebrow">' + eyebrow + '</div><h1 class="small">' + escapeHtml(sl.title) + '</h1></div>' +
       '<div class="content-zone"><div class="imgtext-row">' + imgPart +
-      '<div class="card-block"><div class="card-text">' + nl2br(sl.caption) + '</div></div></div></div>' +
+      '<div class="card-block"><div class="card-text">' + sanitizeRichHtml(sl.caption) + '</div></div></div></div>' +
       '</div>';
   }
 
   if(sl.template === "list"){
     var bullets = sl.bullets || [];
-    var lis = bullets.map(function(b){ return '<li><span class="dot"></span>' + nl2br(b) + '</li>'; }).join("");
+    var lis = bullets.map(function(b){ return '<li><span class="dot"></span><span>' + sanitizeRichHtml(b) + '</span></li>'; }).join("");
     return '<div class="slide-inner">' + decoBg() +
       '<div class="hero-card"><div class="eyebrow">' + eyebrow + '</div><h1 class="small">' + escapeHtml(sl.title) + '</h1></div>' +
       '<div class="content-zone"><div class="card-block"><ul class="bullet-list">' + lis + '</ul></div></div>' +
@@ -618,6 +705,7 @@ function blankSlide(template){
     body: "",
     tryItOut: "",
     examples: [],
+    chips: [],
     imageData: "",
     caption: "",
     bullets: []
@@ -645,11 +733,37 @@ function renderEditorPreview(){
 
 function fieldsForTemplate(t){
   switch(t){
-    case "lesson": return ["title","subtitle","tryItOut","body","examples","color"];
-    case "imagetext": return ["title","image","caption","color"];
-    case "list": return ["title","bullets","color"];
+    case "lesson": return ["colortoolbar","title","subtitle","tryItOut","body","examples","chips","color"];
+    case "imagetext": return ["colortoolbar","title","image","caption","color"];
+    case "list": return ["colortoolbar","title","bullets","color"];
     default: return ["title","color"];
   }
+}
+
+var COLOR_SWATCHES = [
+  { c:"#3a5ea7", label:"blue" },
+  { c:"#e8799f", label:"pink" },
+  { c:"#8a5fd6", label:"purple" },
+  { c:"#4f9c6b", label:"green" }
+];
+
+function richField(key, index, placeholder, value, extraClass){
+  var idxAttr = (index === undefined || index === null) ? "" : (' data-index="' + index + '"');
+  var cls = "rich-field" + (extraClass ? (" " + extraClass) : "");
+  return '<div class="' + cls + '" contenteditable="true" data-key="' + key + '"' + idxAttr +
+    ' data-placeholder="' + escapeHtml(placeholder) + '">' + (value || "") + '</div>';
+}
+
+function itemListField(key, label, placeholder, addLabel){
+  var arr = editorDraft[key] || [];
+  var html = '<div class="form-field"><label>' + escapeHtml(label) + ' (optional)</label><div class="item-list">';
+  arr.forEach(function(val, i){
+    html += '<div class="item-row">' + richField(key, i, placeholder, val, "item-field") +
+      '<button type="button" class="item-del" data-removeitem="' + key + '" data-index="' + i + '" title="Remove">' + icon("trash",13) + '</button></div>';
+  });
+  html += '</div><button type="button" class="btn btn-outline btn-sm" data-additem="' + key + '">' + icon("plusCircle",14) + ' ' + escapeHtml(addLabel) + '</button>' +
+    '<div class="hint">Press enter for a line break within the same box. Use "' + escapeHtml(addLabel) + '" to start a new one.</div></div>';
+  return html;
 }
 
 function renderEditorFields(){
@@ -657,29 +771,30 @@ function renderEditorFields(){
   var flds = fieldsForTemplate(editorDraft.template);
   var html = "";
   flds.forEach(function(f){
-    if(f === "title"){
+    if(f === "colortoolbar"){
+      html += '<div class="color-toolbar">' +
+        '<span class="ct-label">Colour selected text</span>' +
+        COLOR_SWATCHES.map(function(s){ return '<button type="button" class="ct-swatch" style="background:' + s.c + '" data-applycolor="' + s.c + '" title="' + s.label + '"></button>'; }).join("") +
+        '<button type="button" class="ct-swatch ct-clear" data-applycolor="clear">Clear</button>' +
+        '</div>';
+    } else if(f === "title"){
       html += '<div class="form-field"><label>Slide title</label>' +
         '<input type="text" id="f_title" value="' + escapeHtml(editorDraft.title) + '" placeholder="e.g. Adjectives that show feelings"></div>';
     } else if(f === "subtitle"){
       html += '<div class="form-field"><label>Subtitle (optional)</label>' +
         '<input type="text" id="f_subtitle" value="' + escapeHtml(editorDraft.subtitle) + '" placeholder="A short line under the title"></div>';
     } else if(f === "tryItOut"){
-      html += '<div class="form-field"><label>Try it out (optional)</label>' +
-        '<textarea id="f_tryitout" rows="3" placeholder="An exposure question, leave blank to skip this section">' + escapeHtml(editorDraft.tryItOut) + '</textarea></div>';
+      html += '<div class="form-field"><label>Try it out (optional)</label>' + richField("tryItOut", null, "An exposure question, leave blank to skip this section", editorDraft.tryItOut) + '</div>';
     } else if(f === "body"){
-      html += '<div class="form-field"><label>Rule (optional)</label>' +
-        '<textarea id="f_body" rows="3" placeholder="Type the teaching point here, leave blank to skip this section">' + escapeHtml(editorDraft.body) + '</textarea></div>';
+      html += '<div class="form-field"><label>Rule (optional)</label>' + richField("body", null, "Type the teaching point here, leave blank to skip this section", editorDraft.body) + '</div>';
     } else if(f === "examples"){
-      html += '<div class="form-field"><label>Examples (optional)</label>' +
-        '<textarea id="f_examples" rows="3" placeholder="One example per line, leave blank to skip this section">' + escapeHtml((editorDraft.examples||[]).join("\n")) + '</textarea>' +
-        '<div class="hint">Put one example on each line</div></div>';
+      html += itemListField("examples", "Examples", "Type one example", "Add example");
+    } else if(f === "chips"){
+      html += renderChipsField();
     } else if(f === "caption"){
-      html += '<div class="form-field"><label>Text</label>' +
-        '<textarea id="f_caption" rows="4" placeholder="Short explanation to go with the picture">' + escapeHtml(editorDraft.caption) + '</textarea></div>';
+      html += '<div class="form-field"><label>Text</label>' + richField("caption", null, "Short explanation to go with the picture", editorDraft.caption) + '</div>';
     } else if(f === "bullets"){
-      html += '<div class="form-field"><label>Key points</label>' +
-        '<textarea id="f_bullets" rows="5" placeholder="One point per line">' + escapeHtml((editorDraft.bullets||[]).join("\n")) + '</textarea>' +
-        '<div class="hint">Put one point on each line</div></div>';
+      html += itemListField("bullets", "Key points", "Type one point", "Add point");
     } else if(f === "image"){
       html += '<div class="form-field"><label>Image</label>' +
         '<div class="img-upload-row">' +
@@ -698,6 +813,18 @@ function renderEditorFields(){
   attachFieldListeners();
 }
 
+function renderChipsField(){
+  var arr = editorDraft.chips || [];
+  var html = '<div class="form-field"><label>Words to remember (optional)</label>' +
+    '<div class="chip-input-row"><input type="text" id="f_chipinput" placeholder="Type a word, then press enter"><button type="button" class="btn btn-outline btn-sm" id="f_chipadd">Add</button></div>' +
+    '<div class="chip-list">';
+  arr.forEach(function(w,i){
+    html += '<span class="chip-tag">' + escapeHtml(w) + '<button type="button" class="chip-remove" data-removechip="' + i + '">&times;</button></span>';
+  });
+  html += '</div><div class="hint">Shows as small word tags, good for vocabulary lists</div></div>';
+  return html;
+}
+
 function attachFieldListeners(){
   function bindText(id, key){
     var el = document.getElementById(id);
@@ -709,14 +836,6 @@ function attachFieldListeners(){
   }
   bindText("f_title","title");
   bindText("f_subtitle","subtitle");
-  bindText("f_body","body");
-  bindText("f_tryitout","tryItOut");
-  bindText("f_caption","caption");
-
-  var exEl = document.getElementById("f_examples");
-  if(exEl){ exEl.addEventListener("input", function(){ editorDraft.examples = splitLines(exEl.value); renderEditorPreview(); }); }
-  var blEl = document.getElementById("f_bullets");
-  if(blEl){ blEl.addEventListener("input", function(){ editorDraft.bullets = splitLines(blEl.value); renderEditorPreview(); }); }
 
   var colorPicker = document.getElementById("f_colorpicker");
   if(colorPicker){
@@ -756,6 +875,109 @@ function attachFieldListeners(){
       renderEditorFields();
     });
   }
+
+  var chipInput = document.getElementById("f_chipinput");
+  if(chipInput){
+    chipInput.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){ e.preventDefault(); addChip(); }
+    });
+  }
+}
+
+function addChip(){
+  var input = document.getElementById("f_chipinput");
+  if(!input) return;
+  var val = input.value.trim();
+  if(!val) return;
+  editorDraft.chips = editorDraft.chips || [];
+  editorDraft.chips.push(val);
+  renderEditorFields();
+  renderEditorPreview();
+}
+
+/* ---------- rich field behaviour: enter = line break, selection colouring ---------- */
+var activeRichField = null;
+document.addEventListener("focusin", function(e){
+  if(e.target.classList && e.target.classList.contains("rich-field")) activeRichField = e.target;
+});
+document.addEventListener("input", function(e){
+  if(e.target.classList && e.target.classList.contains("rich-field")) syncRichField(e.target);
+});
+document.addEventListener("keydown", function(e){
+  if(e.target.classList && e.target.classList.contains("rich-field") && e.key === "Enter"){
+    e.preventDefault();
+    insertBrAtCaret();
+    syncRichField(e.target);
+  }
+});
+function insertBrAtCaret(){
+  var sel = window.getSelection();
+  if(!sel.rangeCount) return;
+  var range = sel.getRangeAt(0);
+  range.deleteContents();
+  var br = document.createElement("br");
+  range.insertNode(br);
+  range.setStartAfter(br);
+  range.setEndAfter(br);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+document.addEventListener("mousedown", function(e){
+  if(e.target.closest(".ct-swatch")) e.preventDefault();
+});
+document.addEventListener("keydown", function(e){
+  if(!document.getElementById("viewerOverlay").classList.contains("show")) return;
+  if(e.key === "Escape"){ closeViewer(); }
+  else if(e.key === "ArrowLeft" && viewerIndex > 0){ viewerIndex--; renderViewer(); }
+  else if(e.key === "ArrowRight" && viewerIndex < viewerSlides.length - 1){ viewerIndex++; renderViewer(); }
+});
+
+function syncRichField(el){
+  var key = el.getAttribute("data-key");
+  var idxAttr = el.getAttribute("data-index");
+  if(idxAttr !== null){
+    var arr = editorDraft[key] || (editorDraft[key] = []);
+    arr[parseInt(idxAttr,10)] = el.innerHTML;
+  } else {
+    editorDraft[key] = el.innerHTML;
+  }
+  renderEditorPreview();
+}
+
+function applyColorToSelection(color){
+  var sel = window.getSelection();
+  if(!sel.rangeCount) return;
+  var range = sel.getRangeAt(0);
+  if(range.collapsed) return;
+  if(!activeRichField || !activeRichField.contains(range.commonAncestorContainer)) return;
+  var span = document.createElement("span");
+  span.style.color = color;
+  try{
+    range.surroundContents(span);
+  }catch(e){
+    var contents = range.extractContents();
+    span.appendChild(contents);
+    range.insertNode(span);
+  }
+  sel.removeAllRanges();
+  syncRichField(activeRichField);
+}
+
+function isBlankRich(html){
+  var d = document.createElement("div");
+  d.innerHTML = html || "";
+  return !d.textContent.trim();
+}
+function cleanBeforeSave(){
+  if(editorDraft.body !== undefined) editorDraft.body = sanitizeRichHtml(editorDraft.body);
+  if(editorDraft.tryItOut !== undefined) editorDraft.tryItOut = sanitizeRichHtml(editorDraft.tryItOut);
+  if(editorDraft.caption !== undefined) editorDraft.caption = sanitizeRichHtml(editorDraft.caption);
+  if(editorDraft.examples){
+    editorDraft.examples = editorDraft.examples.map(sanitizeRichHtml).filter(function(v){ return !isBlankRich(v); });
+  }
+  if(editorDraft.bullets){
+    editorDraft.bullets = editorDraft.bullets.map(sanitizeRichHtml).filter(function(v){ return !isBlankRich(v); });
+  }
 }
 
 function saveEditorSlide(){
@@ -763,6 +985,7 @@ function saveEditorSlide(){
     alert("Please give this slide a title before saving.");
     return;
   }
+  cleanBeforeSave();
   if(ui.editingSlideId){
     var idx = state.slides.findIndex(function(s){return s.id===ui.editingSlideId;});
     if(idx > -1){
@@ -776,6 +999,31 @@ function saveEditorSlide(){
   saveState();
   closeModal("editorModal");
   renderMain();
+}
+
+/* ---------------- full screen viewer ---------------- */
+var viewerSlides = [];
+var viewerIndex = 0;
+function openViewer(slideId){
+  viewerSlides = slidesFor(ui.topicId);
+  viewerIndex = viewerSlides.findIndex(function(s){return s.id===slideId;});
+  if(viewerIndex < 0) viewerIndex = 0;
+  renderViewer();
+  document.getElementById("viewerOverlay").classList.add("show");
+}
+function renderViewer(){
+  var sl = viewerSlides[viewerIndex];
+  if(!sl) return;
+  var topic = getTopic(ui.topicId);
+  var canvas = document.getElementById("viewerCanvas");
+  canvas.className = "slide-canvas theme-" + sl.color;
+  canvas.innerHTML = renderSlideInner(sl, topic);
+  document.getElementById("viewerCounter").textContent = (viewerIndex+1) + " / " + viewerSlides.length;
+  document.getElementById("viewerPrev").disabled = viewerIndex <= 0;
+  document.getElementById("viewerNext").disabled = viewerIndex >= viewerSlides.length - 1;
+}
+function closeViewer(){
+  document.getElementById("viewerOverlay").classList.remove("show");
 }
 
 /* ---------------- print ---------------- */
@@ -894,6 +1142,63 @@ document.addEventListener("click", function(e){
     var pos2 = ui.editTopicLevels.indexOf(el2);
     if(pos2 > -1){ ui.editTopicLevels.splice(pos2,1); } else { ui.editTopicLevels.push(el2); }
     renderLevelChipRow("editTopicLevels", ui.editTopicLevels, "editlevel");
+    return;
+  }
+
+  var swatchEl = t.closest(".ct-swatch");
+  if(swatchEl){
+    var col = swatchEl.getAttribute("data-applycolor");
+    applyColorToSelection(col === "clear" ? "var(--ink)" : col);
+    return;
+  }
+
+  if(t.id === "f_chipadd"){
+    addChip();
+    return;
+  }
+  var removeChipEl = t.closest("[data-removechip]");
+  if(removeChipEl){
+    var chipIdx = parseInt(removeChipEl.getAttribute("data-removechip"),10);
+    editorDraft.chips.splice(chipIdx,1);
+    renderEditorFields();
+    renderEditorPreview();
+    return;
+  }
+
+  var addItemEl = t.closest("[data-additem]");
+  if(addItemEl){
+    var addKey = addItemEl.getAttribute("data-additem");
+    editorDraft[addKey] = editorDraft[addKey] || [];
+    editorDraft[addKey].push("");
+    renderEditorFields();
+    renderEditorPreview();
+    return;
+  }
+  var removeItemEl = t.closest("[data-removeitem]");
+  if(removeItemEl){
+    var remKey = removeItemEl.getAttribute("data-removeitem");
+    var remIdx = parseInt(removeItemEl.getAttribute("data-index"),10);
+    editorDraft[remKey].splice(remIdx,1);
+    renderEditorFields();
+    renderEditorPreview();
+    return;
+  }
+
+  if(t.id === "viewerClose" || t.id === "viewerOverlay"){
+    closeViewer();
+    return;
+  }
+  if(t.id === "viewerPrev"){
+    if(viewerIndex > 0){ viewerIndex--; renderViewer(); }
+    return;
+  }
+  if(t.id === "viewerNext"){
+    if(viewerIndex < viewerSlides.length - 1){ viewerIndex++; renderViewer(); }
+    return;
+  }
+  var viewEl = t.closest("[data-view]");
+  if(viewEl){
+    openViewer(viewEl.getAttribute("data-view"));
     return;
   }
 
