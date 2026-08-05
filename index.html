@@ -46,7 +46,7 @@ svg{display:block;}
 .app-shell{max-width:1100px;margin:0 auto;padding:20px 22px 60px;}
 
 /* ---------- top bar ---------- */
-.top-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+.top-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
 .brand{display:flex;align-items:center;gap:10px;}
 .brand img{height:46px;width:auto;display:block;}
 .brand-text{display:flex;flex-direction:column;line-height:1.15;}
@@ -69,6 +69,10 @@ svg{display:block;}
 .search-result-item:hover{background:var(--blue-bg);}
 .search-result-item .srtag{font-size:10.5px;color:var(--ink-soft);font-weight:800;display:block;margin-bottom:2px;letter-spacing:.3px;}
 .search-empty{padding:16px;font-size:13px;color:var(--ink-soft);font-weight:700;text-align:center;}
+
+/* ---------- utility bar (backup/restore) ---------- */
+.utility-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.utility-hint{color:var(--ink-soft);font-weight:700;font-size:11.5px;line-height:1.4;}
 
 /* ---------- pill tabs ---------- */
 .tab-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
@@ -94,8 +98,8 @@ svg{display:block;}
   font-weight:800;font-size:13.5px;color:var(--ink);background:var(--cream);border:2px solid transparent;
 }
 .topic-pill.active{background:var(--navy);color:#fff;}
-.topic-pill .tname{cursor:pointer;}
-.topic-pill .tcount{font-size:11px;font-weight:700;opacity:.65;}
+.topic-pill .tname{pointer-events:none;}
+.topic-pill .tcount{font-size:11px;font-weight:700;opacity:.65;pointer-events:none;}
 .topic-pill .ticon{opacity:.55;width:22px;height:22px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
 .topic-pill .ticon:hover{opacity:1;background:rgba(0,0,0,.08);}
 .topic-pill.active .ticon{opacity:.85;}
@@ -111,14 +115,17 @@ svg{display:block;}
 .main-panel{min-height:200px;}
 .main-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .main-panel-header h2{font-size:22px;color:var(--navy-dark);}
-.header-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .btn{padding:10px 18px;border-radius:14px;font-weight:800;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;}
 .btn-primary{background:var(--navy);color:#fff;}
 .btn-primary:hover{background:var(--navy-dark);}
+.btn-primary:disabled{opacity:.4;}
 .btn-outline{background:#fff;border:2px solid var(--card-border);color:var(--ink);}
 .btn-outline:hover{border-color:var(--navy);color:var(--navy);}
 .btn-soft{background:var(--blue-bg);color:var(--navy-dark);}
 .btn-danger{background:var(--pink-deep);color:#fff;}
+.btn-sm{padding:8px 14px;font-size:12.5px;}
+.print-hint{font-size:11px;color:var(--ink-soft);font-weight:700;}
 
 .slide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
 .slide-card{background:#fff;border-radius:var(--radius);border:2px solid var(--card-border);box-shadow:var(--shadow);overflow:hidden;position:relative;}
@@ -130,59 +137,73 @@ svg{display:block;}
 .slide-card .slide-canvas{cursor:pointer;}
 .slide-card .card-foot{padding:8px 12px 10px;font-size:11.5px;color:var(--ink-soft);font-weight:700;display:flex;justify-content:space-between;}
 
+.page-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:20px;}
+.page-controls button{width:36px;height:36px;border-radius:10px;background:#fff;border:2px solid var(--card-border);color:var(--ink);display:flex;align-items:center;justify-content:center;}
+.page-controls button:disabled{opacity:.3;}
+.page-controls span{font-size:12.5px;font-weight:800;color:var(--ink-soft);}
+
 .big-empty{background:#fff;border:2px dashed var(--card-border);border-radius:var(--radius);padding:44px 20px;text-align:center;color:var(--ink-soft);font-weight:700;}
 .big-empty .eb-icon{display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--ink-soft);opacity:.6;}
 
-/* ---------- slide canvas + template ---------- */
+/* ---------- slide canvas + template (no scroll: everything clips like a real slide) ---------- */
 .slide-canvas{
   position:relative;aspect-ratio:4/3;width:100%;container-type:inline-size;
   border-radius:var(--radius);overflow:hidden;
 }
-.theme-blue .slide-canvas-bg,.theme-blue{--bg:var(--blue-bg);--accent:var(--navy);}
-.theme-pink .slide-canvas-bg,.theme-pink{--bg:var(--pink);--accent:var(--pink-deep);}
-.theme-purple .slide-canvas-bg,.theme-purple{--bg:var(--purple);--accent:var(--purple-deep);}
-.theme-green .slide-canvas-bg,.theme-green{--bg:var(--green);--accent:var(--green-deep);}
+.theme-blue{--bg:var(--blue-bg);--accent:var(--navy);}
+.theme-pink{--bg:var(--pink);--accent:var(--pink-deep);}
+.theme-purple{--bg:var(--purple);--accent:var(--purple-deep);}
+.theme-green{--bg:var(--green);--accent:var(--green-deep);}
 
-.slide-inner{position:absolute;inset:0;background:var(--bg);padding:6.5cqw;display:flex;flex-direction:column;overflow:hidden;}
+.slide-inner{position:absolute;inset:0;background:var(--bg);padding:6cqw;display:flex;flex-direction:column;overflow:hidden;}
+.slide-inner.title-slide{justify-content:center;}
 .deco-circle{position:absolute;border-radius:50%;background:var(--accent);opacity:.14;pointer-events:none;z-index:1;}
 .deco-circle.c1{width:22cqw;height:22cqw;top:-8cqw;right:-6cqw;}
 .deco-circle.c2{width:10cqw;height:10cqw;bottom:4cqw;left:-4cqw;opacity:.16;}
 .deco-star{position:absolute;color:var(--accent);opacity:.4;z-index:1;pointer-events:none;}
 .deco-star.s1{width:7cqw;height:7cqw;top:5cqw;right:9cqw;}
 .deco-star.s2{width:4.2cqw;height:4.2cqw;bottom:8cqw;right:5cqw;opacity:.3;}
+.brand-stamp{position:absolute;bottom:2.6cqw;right:4cqw;font-size:1.9cqw;font-weight:800;color:var(--ink-soft);opacity:.5;z-index:3;letter-spacing:.02em;}
 
-.hero-card{position:relative;z-index:2;background:#fff;border-radius:4cqw;padding:4cqw 5cqw;box-shadow:0 1.4cqw 2.8cqw rgba(35,25,55,.08);margin-bottom:3.6cqw;flex-shrink:0;}
+.hero-card{position:relative;z-index:2;background:#fff;border-radius:4cqw;padding:4.4cqw 5.2cqw;box-shadow:0 1.4cqw 2.8cqw rgba(35,25,55,.08);flex-shrink:0;}
 .hero-card .eyebrow{font-size:2.3cqw;font-weight:800;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:1.2cqw;}
-.hero-card h1{font-size:7.6cqw;color:var(--ink);line-height:1.12;}
-.hero-card h1.small{font-size:5.6cqw;}
-.hero-card .subtitle{font-size:3cqw;font-weight:700;color:var(--ink-soft);margin-top:1.4cqw;line-height:1.4;}
+.hero-card h1{font-size:8cqw;color:var(--ink);line-height:1.12;}
+.hero-card .subtitle{font-size:3cqw;font-weight:700;color:var(--ink-soft);margin-top:1.6cqw;line-height:1.4;}
 
-.content-zone{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;gap:2.6cqw;overflow:auto;min-height:0;}
-.card-block{background:#fff;border-radius:3cqw;padding:3.4cqw 4cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);}
-.card-block .card-label{font-family:'Fredoka One',sans-serif;font-size:2.6cqw;color:var(--accent);margin-bottom:1.2cqw;text-transform:uppercase;letter-spacing:.03em;}
-.card-block .card-text{font-size:3.3cqw;font-weight:700;line-height:1.5;color:var(--ink);white-space:pre-wrap;}
+.compact-header{position:relative;z-index:2;flex-shrink:0;margin-bottom:3.4cqw;}
+.compact-header .eyebrow{font-size:2.1cqw;font-weight:800;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:1.2cqw;opacity:.85;}
+.type-badge{display:inline-block;background:var(--accent);color:#fff;font-family:'Fredoka One',sans-serif;font-size:2.3cqw;padding:.9cqw 2.8cqw;border-radius:20px;margin-bottom:1.4cqw;}
+.compact-header h2{font-size:5cqw;color:var(--ink);line-height:1.16;}
 
-.examples-row{display:flex;flex-direction:column;gap:1.6cqw;}
-.example-card{background:#fff;border-radius:2.6cqw;padding:2.2cqw 3cqw;display:flex;gap:2.2cqw;align-items:center;box-shadow:0 .8cqw 1.6cqw rgba(35,25,55,.05);}
+.content-zone{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;gap:2.2cqw;overflow:hidden;min-height:0;}
+.card-block{background:#fff;border-radius:3cqw;padding:3.6cqw 4.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.card-block .card-text{font-size:3.4cqw;font-weight:700;line-height:1.5;color:var(--ink);white-space:pre-wrap;}
+
+.examples-row{display:flex;flex-direction:column;gap:1.7cqw;flex:1;overflow:hidden;justify-content:center;}
+.example-card{background:#fff;border-radius:2.6cqw;padding:2.3cqw 3cqw;display:flex;gap:2.2cqw;align-items:center;box-shadow:0 .8cqw 1.6cqw rgba(35,25,55,.05);flex-shrink:0;}
 .example-num{font-family:'Fredoka One',sans-serif;background:var(--accent);color:#fff;width:6cqw;height:6cqw;min-width:6cqw;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.9cqw;}
 .example-text{font-size:3.1cqw;font-weight:700;color:var(--ink);line-height:1.35;white-space:pre-wrap;}
 
 /* image and text template */
-.imgtext-row{display:flex;gap:3cqw;flex:1;min-height:0;}
+.imgtext-row{display:flex;gap:3cqw;flex:1;min-height:0;overflow:hidden;}
 .imgtext-row img{width:44%;height:100%;object-fit:cover;border-radius:3cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.08);}
 .imgtext-noimg{width:44%;height:100%;border-radius:3cqw;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5cqw;color:var(--ink-soft);font-weight:700;text-align:center;padding:2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);}
 .imgtext-row .card-block{flex:1;}
 
 /* list template */
-.bullet-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.8cqw;}
+.bullet-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.8cqw;overflow:hidden;}
 .bullet-list li{display:flex;gap:2.2cqw;align-items:flex-start;font-size:3.3cqw;font-weight:700;line-height:1.4;color:var(--ink);}
 .bullet-list li .dot{width:2.6cqw;height:2.6cqw;min-width:2.6cqw;border-radius:50%;background:var(--accent);margin-top:1cqw;}
+
+/* word list / chips */
+.chips-row{display:flex;flex-wrap:wrap;gap:2cqw;flex:1;align-content:flex-start;overflow:hidden;}
+.chip-pill{background:#fff;border:.35cqw solid var(--accent);color:var(--accent);border-radius:1.8cqw;padding:1.8cqw 3.4cqw;font-size:3.2cqw;font-weight:800;box-shadow:0 .6cqw 1.2cqw rgba(35,25,55,.05);}
 
 /* ---------- modal ---------- */
 .modal-overlay{position:fixed;inset:0;background:rgba(35,25,55,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
 .modal-overlay.show{display:flex;}
 .modal-box{background:#fff;border-radius:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:26px;box-shadow:0 20px 50px rgba(30,20,50,.25);}
-.modal-box.wide{max-width:760px;}
+.modal-box.wide{max-width:780px;}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
 .modal-head h3{font-size:19px;color:var(--navy-dark);}
 .modal-close{width:32px;height:32px;border-radius:10px;background:var(--cream);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;}
@@ -190,11 +211,11 @@ svg{display:block;}
 
 .form-field{margin-bottom:14px;}
 .form-field label{display:block;font-size:12.5px;font-weight:800;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.2px;}
-.form-field input[type=text],.form-field textarea{
+.form-field input[type=text]{
   width:100%;padding:11px 13px;border-radius:12px;border:2px solid var(--card-border);font-size:14px;
-  font-family:'Nunito',sans-serif;font-weight:700;color:var(--ink);resize:vertical;
+  font-family:'Nunito',sans-serif;font-weight:700;color:var(--ink);
 }
-.form-field input[type=text]:focus,.form-field textarea:focus{outline:none;border-color:var(--navy);}
+.form-field input[type=text]:focus{outline:none;border-color:var(--navy);}
 .form-field .hint{font-size:11px;color:var(--ink-soft);font-weight:600;margin-top:5px;}
 .theme-picker{display:flex;gap:8px;}
 .theme-swatch{width:34px;height:34px;border-radius:50%;border:3px solid transparent;}
@@ -213,11 +234,6 @@ svg{display:block;}
 .confirm-foot{display:flex;justify-content:flex-end;gap:10px;}
 
 /* ---------- rich text fields ---------- */
-.color-toolbar{position:sticky;top:0;background:#fff;z-index:8;display:flex;align-items:center;gap:8px;padding:8px 0 14px;margin-bottom:6px;border-bottom:2px solid var(--cream);}
-.ct-label{font-size:11.5px;font-weight:800;color:var(--ink-soft);margin-right:2px;}
-.ct-swatch{width:24px;height:24px;border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 2px var(--card-border);}
-.ct-swatch:hover{box-shadow:0 0 0 2px var(--ink-soft);}
-.ct-clear{width:auto;padding:0 10px;font-size:11px;font-weight:800;color:var(--ink-soft);background:var(--cream);box-shadow:none;border-radius:8px;}
 .rich-field{width:100%;padding:11px 13px;border-radius:12px;border:2px solid var(--card-border);font-size:14px;font-family:'Nunito',sans-serif;font-weight:700;color:var(--ink);white-space:pre-wrap;min-height:70px;outline:none;}
 .rich-field:focus{border-color:var(--navy);}
 .rich-field:empty:before{content:attr(data-placeholder);color:#a3a3b5;font-weight:600;}
@@ -226,7 +242,6 @@ svg{display:block;}
 .item-row{display:flex;gap:8px;align-items:flex-start;}
 .item-del{width:36px;height:36px;flex-shrink:0;border-radius:10px;background:var(--cream);color:var(--pink-deep);display:flex;align-items:center;justify-content:center;}
 .item-del:hover{background:var(--pink);}
-.btn-sm{padding:8px 14px;font-size:12.5px;}
 .chip-input-row{display:flex;gap:8px;margin-bottom:10px;}
 .chip-input-row input{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13.5px;font-weight:700;min-width:0;}
 .chip-list{display:flex;flex-wrap:wrap;gap:8px;}
@@ -234,9 +249,23 @@ svg{display:block;}
 .chip-remove{width:18px;height:18px;border-radius:6px;background:rgba(0,0,0,.06);color:var(--ink-soft);font-size:13px;display:flex;align-items:center;justify-content:center;}
 .chip-remove:hover{background:var(--pink);color:var(--pink-deep);}
 
-/* ---------- slide chip pills (rendered on slide) ---------- */
-.chips-row{display:flex;flex-wrap:wrap;gap:1.8cqw;}
-.chip-pill{background:#fff;border:.35cqw solid var(--accent);color:var(--accent);border-radius:1.8cqw;padding:1.6cqw 3.2cqw;font-size:3cqw;font-weight:800;box-shadow:0 .6cqw 1.2cqw rgba(35,25,55,.05);}
+/* floating format toolbar, appears near selected text */
+.floating-toolbar{position:fixed;display:none;align-items:center;gap:6px;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(20,15,30,.25);padding:7px 8px;z-index:3000;border:2px solid var(--card-border);}
+.ft-swatch{width:26px;height:26px;border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 2px var(--card-border);}
+.ft-swatch:hover{box-shadow:0 0 0 2px var(--ink-soft);}
+.ft-btn{width:28px;height:28px;border-radius:8px;background:var(--cream);color:var(--ink);display:flex;align-items:center;justify-content:center;}
+.ft-btn:hover{background:var(--blue-bg);}
+.ft-clear{width:auto;padding:0 10px;font-size:11px;font-weight:800;color:var(--ink-soft);background:var(--cream);border-radius:8px;}
+
+/* ---------- add slides modal ---------- */
+.type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:16px;}
+.type-card{border:2px solid var(--card-border);border-radius:14px;padding:14px;text-align:left;background:#fff;}
+.type-card.selected{border-color:var(--navy);background:var(--blue-bg);}
+.type-card .tc-top{display:flex;align-items:center;gap:8px;color:var(--navy);font-family:'Fredoka One',sans-serif;font-size:14px;margin-bottom:5px;}
+.type-card .tc-top span{flex:1;}
+.type-card .tc-desc{font-size:11.5px;font-weight:700;color:var(--ink-soft);line-height:1.4;}
+.type-card .tc-check{width:18px;height:18px;border-radius:6px;border:2px solid var(--card-border);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+.type-card.selected .tc-check{background:var(--navy);border-color:var(--navy);}
 
 /* ---------- full screen viewer ---------- */
 .viewer-overlay{position:fixed;inset:0;background:rgba(20,15,32,.94);display:none;align-items:center;justify-content:center;gap:22px;z-index:2000;padding:30px;}
@@ -282,6 +311,13 @@ svg{display:block;}
     </div>
   </div>
 
+  <div class="utility-bar">
+    <button class="btn btn-outline btn-sm" id="backupBtn"></button>
+    <button class="btn btn-outline btn-sm" id="restoreBtn"></button>
+    <input type="file" id="restoreFileInput" accept="application/json" style="display:none;">
+    <span class="utility-hint">Slides are saved in this browser only. Back up before you update or move the file, then restore after, so nothing is lost.</span>
+  </div>
+
   <div class="tab-row" id="subjectTabs"></div>
   <div class="tab-row" id="levelTabs"></div>
 
@@ -304,6 +340,25 @@ svg{display:block;}
         <div class="header-actions" id="topicActions"></div>
       </div>
       <div id="slideArea"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add slides modal -->
+<div class="modal-overlay" id="addSlidesModal">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <h3>Add slides</h3>
+      <button class="modal-close" data-close="addSlidesModal">&times;</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button type="button" class="btn btn-soft btn-sm" id="useDefaultBtn">Use default template</button>
+      <button type="button" class="btn btn-outline btn-sm" id="clearAllBtn">Clear all</button>
+    </div>
+    <div class="type-grid" id="typeGrid"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close="addSlidesModal">Cancel</button>
+      <button class="btn btn-primary" id="createSlidesBtn">Create slides</button>
     </div>
   </div>
 </div>
@@ -379,6 +434,16 @@ svg{display:block;}
   <button class="viewer-nav" id="viewerNext">&rsaquo;</button>
 </div>
 
+<!-- Floating format toolbar for rich text selections -->
+<div class="floating-toolbar" id="floatingToolbar">
+  <button type="button" class="ft-swatch" style="background:#3a5ea7" data-applycolor="#3a5ea7" title="blue"></button>
+  <button type="button" class="ft-swatch" style="background:#e8799f" data-applycolor="#e8799f" title="pink"></button>
+  <button type="button" class="ft-swatch" style="background:#8a5fd6" data-applycolor="#8a5fd6" title="purple"></button>
+  <button type="button" class="ft-swatch" style="background:#4f9c6b" data-applycolor="#4f9c6b" title="green"></button>
+  <button type="button" class="ft-btn" id="ftStrikeBtn" title="Strikethrough"></button>
+  <button type="button" class="ft-clear" data-applycolor="clear">Clear</button>
+</div>
+
 <script>
 (function(){
 "use strict";
@@ -398,17 +463,32 @@ function icon(name, size){
     image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
     list: '<line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/>',
     folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>',
-    plusCircle: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'
+    plusCircle: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+    check: '<polyline points="20 6 9 17 4 12"/>',
+    lightbulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+    tag: '<path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24L3 3l.24 6.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.82z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/>',
+    download: '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>',
+    upload: '<path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/>',
+    chevronLeft: '<polyline points="15 18 9 12 15 6"/>',
+    chevronRight: '<polyline points="9 18 15 12 9 6"/>',
+    strike: '<path d="M6 4h8a3 3 0 0 1 2.5 4.5"/><path d="M18 20H8a3 3 0 0 1-2.7-4.4"/><line x1="3" y1="12" x2="21" y2="12"/>'
   }[name] || '';
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
 }
 var STAR_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" width="100%" height="100%"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2L12 16.9l-6.3 4.1L8 13.8 2 9.2h7.6z"/></svg>';
 
 var TEMPLATES = {
-  lesson:    { icon:"book",  name:"Lesson slide", desc:"Title, try it out, rule and examples together. Only fill in what you need." },
-  imagetext: { icon:"image", name:"Picture and text", desc:"An image beside a short explanation" },
-  list:      { icon:"list",  name:"Key points", desc:"A simple list of points" }
+  title:     { icon:"book",      name:"Title",           desc:"Cover slide with a title and optional subtitle" },
+  tryitout:  { icon:"lightbulb", name:"Try it out",       desc:"An exposure question for students to attempt first" },
+  rule:      { icon:"book",      name:"Rule",             desc:"One teaching point, explained clearly" },
+  examples:  { icon:"list",      name:"Examples",         desc:"A set of numbered example sentences" },
+  wordlist:  { icon:"tag",       name:"Word list",        desc:"Small tags for words to memorise" },
+  imagetext: { icon:"image",     name:"Picture and text", desc:"An image beside a short explanation" },
+  list:      { icon:"list",      name:"Key points",       desc:"A simple bulleted list" }
 };
+var DEFAULT_BUNDLE = ["title","tryitout","rule","examples"];
+var TYPE_ORDER = Object.keys(TEMPLATES);
+var PAGE_SIZE = 9;
 
 /* ---------------- persistence ---------------- */
 var STORE_KEY = "okieSlideStudioData";
@@ -448,11 +528,13 @@ var ui = {
   subjectId: state.subjects[0] ? state.subjects[0].id : null,
   level: "P5",
   topicId: null,
+  slidePage: 0,
   editingSlideId: null,
   pendingDelete: null,
   newTopicLevels: ["P5"],
   editTopicLevels: [],
-  editingTopicId: null
+  editingTopicId: null,
+  addSlidesSelection: []
 };
 
 /* ---------------- helpers ---------------- */
@@ -477,27 +559,22 @@ function sanitizeRichHtml(html){
           return;
         }
         if(child.tagName === "DIV"){
-          // contenteditable sometimes wraps lines in DIVs on Enter; treat as a line break
           var br = document.createElement("br");
           node.insertBefore(br, child);
           while(child.firstChild){ node.insertBefore(child.firstChild, child); }
           node.removeChild(child);
           return;
         }
-        var keepStyle = null;
-        if(child.tagName === "SPAN" && child.style && child.style.color){
-          keepStyle = "color:" + child.style.color;
-        }
+        var styleParts = [];
+        if(child.style && child.style.color) styleParts.push("color:" + child.style.color);
+        if(child.style && child.style.textDecoration && child.style.textDecoration.indexOf("line-through") > -1) styleParts.push("text-decoration:line-through");
         Array.prototype.slice.call(child.attributes).forEach(function(attr){ child.removeAttribute(attr.name); });
-        if(keepStyle) child.setAttribute("style", keepStyle);
+        if(styleParts.length) child.setAttribute("style", styleParts.join(";"));
         clean(child);
       }
     });
   })(holder);
   return holder.innerHTML;
-}
-function splitLines(str){
-  return String(str||"").split("\n").map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
 }
 function topicsFor(subjectId, level){
   return state.topics.filter(function(t){ return t.subjectId === subjectId && t.levels.indexOf(level) > -1; });
@@ -555,8 +632,8 @@ function renderTopicPills(){
     list.forEach(function(t){
       var active = t.id === ui.topicId ? " active" : "";
       var count = slidesFor(t.id).length;
-      html += '<div class="topic-pill' + active + '">' +
-        '<span class="tname" data-topic="' + t.id + '">' + escapeHtml(t.name) + '</span>' +
+      html += '<div class="topic-pill' + active + '" data-topic="' + t.id + '">' +
+        '<span class="tname">' + escapeHtml(t.name) + '</span>' +
         '<span class="tcount">' + count + '</span>' +
         '<span class="ticon" data-edittopic="' + t.id + '">' + icon("edit",13) + '</span>' +
         '</div>';
@@ -585,16 +662,23 @@ function renderMain(){
 
   heading.textContent = topic.name;
   actions.innerHTML =
-    '<button class="btn btn-primary" id="addSlideBtn">' + icon("plusCircle",15) + ' Add slide</button>' +
-    '<button class="btn btn-soft" id="printTopicBtn">' + icon("print",15) + ' Print all</button>';
+    '<button class="btn btn-primary" id="addSlideBtn">' + icon("plusCircle",15) + ' Add slides</button>' +
+    '<button class="btn btn-soft" id="printTopicBtn">' + icon("print",15) + ' Print all</button>' +
+    '<span class="print-hint">Tip: untick "Headers and footers" in the print dialog</span>';
 
-  var slides = slidesFor(topic.id);
-  if(!slides.length){
-    area.innerHTML = '<div class="big-empty"><span class="eb-icon">' + icon("plusCircle",30) + '</span>No slides in this topic yet. Click "Add slide" to make your first one.</div>';
+  var allSlides = slidesFor(topic.id);
+  if(!allSlides.length){
+    area.innerHTML = '<div class="big-empty"><span class="eb-icon">' + icon("plusCircle",30) + '</span>No slides in this topic yet. Click "Add slides" to make your first ones.</div>';
     return;
   }
+
+  var totalPages = Math.max(1, Math.ceil(allSlides.length / PAGE_SIZE));
+  if(ui.slidePage >= totalPages) ui.slidePage = totalPages - 1;
+  if(ui.slidePage < 0) ui.slidePage = 0;
+  var pageSlides = allSlides.slice(ui.slidePage * PAGE_SIZE, ui.slidePage * PAGE_SIZE + PAGE_SIZE);
+
   var html = '<div class="slide-grid">';
-  slides.forEach(function(sl){
+  pageSlides.forEach(function(sl){
     html += '<div class="slide-card">' +
       '<div class="card-actions">' +
         '<button class="icon-btn print-btn" title="Print this slide" data-printone="' + sl.id + '">' + icon("print",13) + '</button>' +
@@ -602,48 +686,76 @@ function renderMain(){
         '<button class="icon-btn del-btn" title="Delete" data-delslide="' + sl.id + '">' + icon("trash",13) + '</button>' +
       '</div>' +
       '<div class="slide-canvas theme-' + sl.color + '" data-view="' + sl.id + '">' + renderSlideInner(sl, topic) + '</div>' +
-      '<div class="card-foot"><span>' + TEMPLATES[sl.template].name + '</span></div>' +
+      '<div class="card-foot"><span>' + (TEMPLATES[sl.template] ? TEMPLATES[sl.template].name : sl.template) + '</span></div>' +
     '</div>';
   });
   html += '</div>';
+
+  if(totalPages > 1){
+    html += '<div class="page-controls">' +
+      '<button id="pagePrevBtn"' + (ui.slidePage<=0 ? ' disabled' : '') + '>' + icon("chevronLeft",14) + '</button>' +
+      '<span>Page ' + (ui.slidePage+1) + ' of ' + totalPages + '</span>' +
+      '<button id="pageNextBtn"' + (ui.slidePage>=totalPages-1 ? ' disabled' : '') + '>' + icon("chevronRight",14) + '</button>' +
+      '</div>';
+  }
   area.innerHTML = html;
 }
 
-/* ---------------- decorative background ---------------- */
+/* ---------------- decorative background + branding ---------------- */
 function decoBg(){
   return '<div class="deco-circle c1"></div><div class="deco-circle c2"></div>' +
     '<div class="deco-star s1">' + STAR_SVG + '</div><div class="deco-star s2">' + STAR_SVG + '</div>';
 }
+function brandStamp(subjectName){
+  var label = "OkieDokie" + (subjectName ? (" " + subjectName) : "") + " by Teacher Ari";
+  return '<div class="brand-stamp">' + escapeHtml(label) + '</div>';
+}
 
-/* ---------------- template rendering ---------------- */
+/* ---------------- template rendering (each type fits on one page, no scroll) ---------------- */
 function renderSlideInner(sl, topic){
   var subject = topic ? getSubject(topic.subjectId) : null;
   var eyebrow = (subject ? escapeHtml(subject.name) : "") + (topic ? (' &middot; ' + escapeHtml(topic.name)) : '');
+  var chrome = decoBg() + brandStamp(subject ? subject.name : "");
 
-  if(sl.template === "lesson"){
-    var blocks = "";
-    if(sl.tryItOut){
-      blocks += '<div class="card-block"><div class="card-label">Try it out</div><div class="card-text">' + sanitizeRichHtml(sl.tryItOut) + '</div></div>';
-    }
-    if(sl.body){
-      blocks += '<div class="card-block"><div class="card-label">Rule</div><div class="card-text">' + sanitizeRichHtml(sl.body) + '</div></div>';
-    }
-    var exs = sl.examples || [];
-    if(exs.length){
-      blocks += '<div class="examples-row">' + exs.map(function(e,i){
-        return '<div class="example-card"><div class="example-num">' + (i+1) + '</div><div class="example-text">' + sanitizeRichHtml(e) + '</div></div>';
-      }).join("") + '</div>';
-    }
-    var chips = sl.chips || [];
-    if(chips.length){
-      blocks += '<div class="chips-row">' + chips.map(function(w){ return '<span class="chip-pill">' + escapeHtml(w) + '</span>'; }).join("") + '</div>';
-    }
-    return '<div class="slide-inner">' + decoBg() +
-      '<div class="hero-card"><div class="eyebrow">' + eyebrow + '</div>' +
-      '<h1' + (blocks ? ' class="small"' : '') + '>' + nl2br(sl.title) + '</h1>' +
+  if(sl.template === "title"){
+    return '<div class="slide-inner title-slide">' + chrome +
+      '<div class="hero-card" style="margin:0 auto;width:100%;"><div class="eyebrow">' + eyebrow + '</div>' +
+      '<h1>' + nl2br(sl.title) + '</h1>' +
       (sl.subtitle ? '<div class="subtitle">' + nl2br(sl.subtitle) + '</div>' : '') +
-      '</div>' +
-      (blocks ? '<div class="content-zone">' + blocks + '</div>' : '') +
+      '</div></div>';
+  }
+
+  if(sl.template === "tryitout"){
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="eyebrow">' + eyebrow + '</div><div class="type-badge">Try it out</div><h2>' + escapeHtml(sl.title) + '</h2></div>' +
+      '<div class="content-zone"><div class="card-block"><div class="card-text">' + sanitizeRichHtml(sl.tryItOut) + '</div></div></div>' +
+      '</div>';
+  }
+
+  if(sl.template === "rule"){
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="eyebrow">' + eyebrow + '</div><div class="type-badge">Rule</div><h2>' + escapeHtml(sl.title) + '</h2></div>' +
+      '<div class="content-zone"><div class="card-block"><div class="card-text">' + sanitizeRichHtml(sl.body) + '</div></div></div>' +
+      '</div>';
+  }
+
+  if(sl.template === "examples"){
+    var exs = sl.examples || [];
+    var exHtml = exs.map(function(e,i){
+      return '<div class="example-card"><div class="example-num">' + (i+1) + '</div><div class="example-text">' + sanitizeRichHtml(e) + '</div></div>';
+    }).join("");
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="eyebrow">' + eyebrow + '</div><div class="type-badge">Examples</div><h2>' + escapeHtml(sl.title) + '</h2></div>' +
+      '<div class="content-zone"><div class="examples-row">' + exHtml + '</div></div>' +
+      '</div>';
+  }
+
+  if(sl.template === "wordlist"){
+    var chips = sl.chips || [];
+    var chipsHtml = chips.map(function(w){ return '<span class="chip-pill">' + escapeHtml(w) + '</span>'; }).join("");
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="eyebrow">' + eyebrow + '</div><div class="type-badge">Word list</div><h2>' + escapeHtml(sl.title) + '</h2></div>' +
+      '<div class="content-zone"><div class="chips-row">' + chipsHtml + '</div></div>' +
       '</div>';
   }
 
@@ -651,8 +763,8 @@ function renderSlideInner(sl, topic){
     var imgPart = sl.imageData ?
       '<img src="' + sl.imageData + '" alt="">' :
       '<div class="imgtext-noimg">No image added</div>';
-    return '<div class="slide-inner">' + decoBg() +
-      '<div class="hero-card"><div class="eyebrow">' + eyebrow + '</div><h1 class="small">' + escapeHtml(sl.title) + '</h1></div>' +
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="eyebrow">' + eyebrow + '</div><h2>' + escapeHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="imgtext-row">' + imgPart +
       '<div class="card-block"><div class="card-text">' + sanitizeRichHtml(sl.caption) + '</div></div></div></div>' +
       '</div>';
@@ -661,46 +773,49 @@ function renderSlideInner(sl, topic){
   if(sl.template === "list"){
     var bullets = sl.bullets || [];
     var lis = bullets.map(function(b){ return '<li><span class="dot"></span><span>' + sanitizeRichHtml(b) + '</span></li>'; }).join("");
-    return '<div class="slide-inner">' + decoBg() +
-      '<div class="hero-card"><div class="eyebrow">' + eyebrow + '</div><h1 class="small">' + escapeHtml(sl.title) + '</h1></div>' +
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="eyebrow">' + eyebrow + '</div><div class="type-badge">Key points</div><h2>' + escapeHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="card-block"><ul class="bullet-list">' + lis + '</ul></div></div>' +
       '</div>';
   }
-  return '';
+
+  return '<div class="slide-inner">' + chrome + '<div class="compact-header"><h2>' + escapeHtml(sl.title || "Untitled") + '</h2></div></div>';
 }
 
 /* ---------------- modal helpers ---------------- */
 function openModal(id){ document.getElementById(id).classList.add("show"); }
 function closeModal(id){ document.getElementById(id).classList.remove("show"); }
 
-/* ---------------- template picker (rendered inline via prompt-free chooser) ---------------- */
-function pickTemplateThenOpen(){
-  // simple inline picker using the editor modal itself: show template choice first
-  var wrap = document.getElementById("editorFields");
-  document.getElementById("editorHeading").textContent = "New slide";
-  document.getElementById("editorPreviewWrap").style.display = "none";
-  var html = '<div class="form-field"><label>Choose a slide type</label></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">';
-  Object.keys(TEMPLATES).forEach(function(key){
-    var t = TEMPLATES[key];
-    html += '<button type="button" class="btn btn-outline" style="flex-direction:column;align-items:flex-start;gap:6px;padding:16px;height:auto;text-align:left;" data-tplchoose="' + key + '">' +
-      '<span style="display:flex;align-items:center;gap:8px;color:var(--navy);font-family:\'Fredoka One\',sans-serif;font-size:14px;">' + icon(t.icon,17) + escapeHtml(t.name) + '</span>' +
-      '<span style="font-size:11.5px;font-weight:700;color:var(--ink-soft);line-height:1.4;">' + escapeHtml(t.desc) + '</span>' +
-      '</button>';
-  });
-  html += '</div>';
-  wrap.innerHTML = html;
-  document.getElementById("saveSlideBtn").style.display = "none";
-  openModal("editorModal");
+/* ---------------- add slides (bulk creation) ---------------- */
+function openAddSlidesModal(){
+  ui.addSlidesSelection = DEFAULT_BUNDLE.slice();
+  renderTypeGrid();
+  openModal("addSlidesModal");
 }
-
-/* ---------------- editor ---------------- */
-function blankSlide(template){
+function renderTypeGrid(){
+  var grid = document.getElementById("typeGrid");
+  var html = "";
+  TYPE_ORDER.forEach(function(key){
+    var t = TEMPLATES[key];
+    var sel = ui.addSlidesSelection.indexOf(key) > -1;
+    html += '<button type="button" class="type-card' + (sel?' selected':'') + '" data-typekey="' + key + '">' +
+      '<div class="tc-top">' + icon(t.icon,16) + '<span>' + escapeHtml(t.name) + '</span><span class="tc-check">' + (sel ? icon("check",12) : '') + '</span></div>' +
+      '<div class="tc-desc">' + escapeHtml(t.desc) + '</div></button>';
+  });
+  grid.innerHTML = html;
+  var createBtn = document.getElementById("createSlidesBtn");
+  var n = ui.addSlidesSelection.length;
+  createBtn.textContent = "Create " + n + " slide" + (n===1?"":"s");
+  createBtn.disabled = n===0;
+}
+function blankSlideOfType(key){
+  var placeholderTitles = { title:"New title slide", tryitout:"Try it out", rule:"New rule", examples:"Examples", wordlist:"Word list", imagetext:"New picture slide", list:"Key points" };
   return {
-    id: null,
+    id: uid("slide"),
     topicId: ui.topicId,
-    template: template,
+    template: key,
     color: THEMES[Math.floor(Math.random()*THEMES.length)],
-    title: "",
+    title: placeholderTitles[key] || "New slide",
     subtitle: "",
     body: "",
     tryItOut: "",
@@ -711,14 +826,25 @@ function blankSlide(template){
     bullets: []
   };
 }
+function createSlidesBatch(){
+  if(!ui.addSlidesSelection.length) return;
+  var toCreate = TYPE_ORDER.filter(function(k){ return ui.addSlidesSelection.indexOf(k) > -1; });
+  toCreate.forEach(function(key){
+    state.slides.push(blankSlideOfType(key));
+  });
+  saveState();
+  closeModal("addSlidesModal");
+  ui.slidePage = 0;
+  renderMain();
+}
+
+/* ---------------- editor ---------------- */
 var editorDraft = null;
 
 function openEditorFor(template, existing){
-  editorDraft = existing ? JSON.parse(JSON.stringify(existing)) : blankSlide(template);
+  editorDraft = existing ? JSON.parse(JSON.stringify(existing)) : blankSlideOfType(template);
   ui.editingSlideId = existing ? existing.id : null;
-  document.getElementById("editorHeading").textContent = existing ? "Edit slide" : "New slide: " + TEMPLATES[template].name;
-  document.getElementById("saveSlideBtn").style.display = "";
-  document.getElementById("editorPreviewWrap").style.display = "";
+  document.getElementById("editorHeading").textContent = existing ? "Edit slide" : "New slide";
   renderEditorFields();
   renderEditorPreview();
   openModal("editorModal");
@@ -733,19 +859,16 @@ function renderEditorPreview(){
 
 function fieldsForTemplate(t){
   switch(t){
-    case "lesson": return ["colortoolbar","title","subtitle","tryItOut","body","examples","chips","color"];
-    case "imagetext": return ["colortoolbar","title","image","caption","color"];
-    case "list": return ["colortoolbar","title","bullets","color"];
+    case "title": return ["title","subtitle","color"];
+    case "tryitout": return ["title","tryItOut","color"];
+    case "rule": return ["title","body","color"];
+    case "examples": return ["title","examples","color"];
+    case "wordlist": return ["title","chips","color"];
+    case "imagetext": return ["title","image","caption","color"];
+    case "list": return ["title","bullets","color"];
     default: return ["title","color"];
   }
 }
-
-var COLOR_SWATCHES = [
-  { c:"#3a5ea7", label:"blue" },
-  { c:"#e8799f", label:"pink" },
-  { c:"#8a5fd6", label:"purple" },
-  { c:"#4f9c6b", label:"green" }
-];
 
 function richField(key, index, placeholder, value, extraClass){
   var idxAttr = (index === undefined || index === null) ? "" : (' data-index="' + index + '"');
@@ -762,7 +885,7 @@ function itemListField(key, label, placeholder, addLabel){
       '<button type="button" class="item-del" data-removeitem="' + key + '" data-index="' + i + '" title="Remove">' + icon("trash",13) + '</button></div>';
   });
   html += '</div><button type="button" class="btn btn-outline btn-sm" data-additem="' + key + '">' + icon("plusCircle",14) + ' ' + escapeHtml(addLabel) + '</button>' +
-    '<div class="hint">Press enter for a line break within the same box. Use "' + escapeHtml(addLabel) + '" to start a new one.</div></div>';
+    '<div class="hint">Select text and use the toolbar that appears to colour or strike it. Enter makes a line break in the same box, use "' + escapeHtml(addLabel) + '" to start a new one.</div></div>';
   return html;
 }
 
@@ -771,28 +894,25 @@ function renderEditorFields(){
   var flds = fieldsForTemplate(editorDraft.template);
   var html = "";
   flds.forEach(function(f){
-    if(f === "colortoolbar"){
-      html += '<div class="color-toolbar">' +
-        '<span class="ct-label">Colour selected text</span>' +
-        COLOR_SWATCHES.map(function(s){ return '<button type="button" class="ct-swatch" style="background:' + s.c + '" data-applycolor="' + s.c + '" title="' + s.label + '"></button>'; }).join("") +
-        '<button type="button" class="ct-swatch ct-clear" data-applycolor="clear">Clear</button>' +
-        '</div>';
-    } else if(f === "title"){
+    if(f === "title"){
       html += '<div class="form-field"><label>Slide title</label>' +
         '<input type="text" id="f_title" value="' + escapeHtml(editorDraft.title) + '" placeholder="e.g. Adjectives that show feelings"></div>';
     } else if(f === "subtitle"){
       html += '<div class="form-field"><label>Subtitle (optional)</label>' +
         '<input type="text" id="f_subtitle" value="' + escapeHtml(editorDraft.subtitle) + '" placeholder="A short line under the title"></div>';
     } else if(f === "tryItOut"){
-      html += '<div class="form-field"><label>Try it out (optional)</label>' + richField("tryItOut", null, "An exposure question, leave blank to skip this section", editorDraft.tryItOut) + '</div>';
+      html += '<div class="form-field"><label>Try it out</label>' + richField("tryItOut", null, "An exposure question", editorDraft.tryItOut) +
+        '<div class="hint">Select text and use the toolbar that appears to colour or strike it</div></div>';
     } else if(f === "body"){
-      html += '<div class="form-field"><label>Rule (optional)</label>' + richField("body", null, "Type the teaching point here, leave blank to skip this section", editorDraft.body) + '</div>';
+      html += '<div class="form-field"><label>Rule</label>' + richField("body", null, "Type the teaching point here", editorDraft.body) +
+        '<div class="hint">Select text and use the toolbar that appears to colour or strike it</div></div>';
     } else if(f === "examples"){
       html += itemListField("examples", "Examples", "Type one example", "Add example");
     } else if(f === "chips"){
       html += renderChipsField();
     } else if(f === "caption"){
-      html += '<div class="form-field"><label>Text</label>' + richField("caption", null, "Short explanation to go with the picture", editorDraft.caption) + '</div>';
+      html += '<div class="form-field"><label>Text</label>' + richField("caption", null, "Short explanation to go with the picture", editorDraft.caption) +
+        '<div class="hint">Select text and use the toolbar that appears to colour or strike it</div></div>';
     } else if(f === "bullets"){
       html += itemListField("bullets", "Key points", "Type one point", "Add point");
     } else if(f === "image"){
@@ -803,7 +923,7 @@ function renderEditorFields(){
         (editorDraft.imageData ? '<button type="button" class="btn btn-outline" id="f_imgremove">Remove</button>' : '') +
         '</div></div>';
     } else if(f === "color"){
-      html += '<div class="form-field"><label>Colour theme</label><div class="theme-picker" id="f_colorpicker">' +
+      html += '<div class="form-field"><label>Colour theme (slide background)</label><div class="theme-picker" id="f_colorpicker">' +
         THEMES.map(function(c){
           return '<button type="button" class="theme-swatch ' + c + (editorDraft.color===c?' selected':'') + '" data-color="' + c + '"></button>';
         }).join("") + '</div></div>';
@@ -815,13 +935,13 @@ function renderEditorFields(){
 
 function renderChipsField(){
   var arr = editorDraft.chips || [];
-  var html = '<div class="form-field"><label>Words to remember (optional)</label>' +
+  var html = '<div class="form-field"><label>Words to remember</label>' +
     '<div class="chip-input-row"><input type="text" id="f_chipinput" placeholder="Type a word, then press enter"><button type="button" class="btn btn-outline btn-sm" id="f_chipadd">Add</button></div>' +
     '<div class="chip-list">';
   arr.forEach(function(w,i){
     html += '<span class="chip-tag">' + escapeHtml(w) + '<button type="button" class="chip-remove" data-removechip="' + i + '">&times;</button></span>';
   });
-  html += '</div><div class="hint">Shows as small word tags, good for vocabulary lists</div></div>';
+  html += '</div></div>';
   return html;
 }
 
@@ -895,11 +1015,7 @@ function addChip(){
   renderEditorPreview();
 }
 
-/* ---------- rich field behaviour: enter = line break, selection colouring ---------- */
-var activeRichField = null;
-document.addEventListener("focusin", function(e){
-  if(e.target.classList && e.target.classList.contains("rich-field")) activeRichField = e.target;
-});
+/* ---------- rich field behaviour: enter = line break within the box ---------- */
 document.addEventListener("input", function(e){
   if(e.target.classList && e.target.classList.contains("rich-field")) syncRichField(e.target);
 });
@@ -922,16 +1038,6 @@ function insertBrAtCaret(){
   sel.removeAllRanges();
   sel.addRange(range);
 }
-document.addEventListener("mousedown", function(e){
-  if(e.target.closest(".ct-swatch")) e.preventDefault();
-});
-document.addEventListener("keydown", function(e){
-  if(!document.getElementById("viewerOverlay").classList.contains("show")) return;
-  if(e.key === "Escape"){ closeViewer(); }
-  else if(e.key === "ArrowLeft" && viewerIndex > 0){ viewerIndex--; renderViewer(); }
-  else if(e.key === "ArrowRight" && viewerIndex < viewerSlides.length - 1){ viewerIndex++; renderViewer(); }
-});
-
 function syncRichField(el){
   var key = el.getAttribute("data-key");
   var idxAttr = el.getAttribute("data-index");
@@ -944,14 +1050,51 @@ function syncRichField(el){
   renderEditorPreview();
 }
 
-function applyColorToSelection(color){
+/* ---------- floating format toolbar ---------- */
+var activeRichField = null;
+document.getElementById("ftStrikeBtn").innerHTML = icon("strike",14);
+
+document.addEventListener("selectionchange", function(){
+  var editorEl = document.getElementById("editorModal");
+  if(!editorEl.classList.contains("show")){ hideFloatingToolbar(); return; }
+  var sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0 || sel.isCollapsed){ hideFloatingToolbar(); return; }
+  var range = sel.getRangeAt(0);
+  var node = sel.anchorNode;
+  var el = node && node.nodeType === 3 ? node.parentElement : node;
+  var richEl = el && el.closest ? el.closest(".rich-field") : null;
+  if(!richEl){ hideFloatingToolbar(); return; }
+  activeRichField = richEl;
+  var rect = range.getBoundingClientRect();
+  if(rect.width === 0 && rect.height === 0){ hideFloatingToolbar(); return; }
+  positionFloatingToolbar(rect);
+});
+function positionFloatingToolbar(rect){
+  var tb = document.getElementById("floatingToolbar");
+  tb.style.display = "flex";
+  var left = rect.left + rect.width/2 - 100;
+  left = Math.max(8, Math.min(left, window.innerWidth - 208));
+  var top = rect.top - 50;
+  if(top < 8) top = rect.bottom + 10;
+  tb.style.left = left + "px";
+  tb.style.top = top + "px";
+}
+function hideFloatingToolbar(){
+  var tb = document.getElementById("floatingToolbar");
+  if(tb) tb.style.display = "none";
+}
+document.addEventListener("mousedown", function(e){
+  if(e.target.closest(".floating-toolbar")) e.preventDefault();
+});
+function applyFormatToSelection(styleObj){
   var sel = window.getSelection();
   if(!sel.rangeCount) return;
   var range = sel.getRangeAt(0);
   if(range.collapsed) return;
   if(!activeRichField || !activeRichField.contains(range.commonAncestorContainer)) return;
   var span = document.createElement("span");
-  span.style.color = color;
+  if(styleObj.color) span.style.color = styleObj.color;
+  if(styleObj.textDecoration) span.style.textDecoration = styleObj.textDecoration;
   try{
     range.surroundContents(span);
   }catch(e){
@@ -961,6 +1104,7 @@ function applyColorToSelection(color){
   }
   sel.removeAllRanges();
   syncRichField(activeRichField);
+  hideFloatingToolbar();
 }
 
 function isBlankRich(html){
@@ -1025,6 +1169,12 @@ function renderViewer(){
 function closeViewer(){
   document.getElementById("viewerOverlay").classList.remove("show");
 }
+document.addEventListener("keydown", function(e){
+  if(!document.getElementById("viewerOverlay").classList.contains("show")) return;
+  if(e.key === "Escape"){ closeViewer(); }
+  else if(e.key === "ArrowLeft" && viewerIndex > 0){ viewerIndex--; renderViewer(); }
+  else if(e.key === "ArrowRight" && viewerIndex < viewerSlides.length - 1){ viewerIndex++; renderViewer(); }
+});
 
 /* ---------------- print ---------------- */
 function printSlides(list, topic){
@@ -1036,6 +1186,9 @@ function printSlides(list, topic){
   area.innerHTML = html;
   window.print();
 }
+var savedTitle = document.title;
+window.addEventListener("beforeprint", function(){ savedTitle = document.title; document.title = ""; });
+window.addEventListener("afterprint", function(){ document.title = savedTitle; });
 
 /* ---------------- confirm delete ---------------- */
 function askConfirm(message, onYes){
@@ -1055,6 +1208,45 @@ function openTopicEdit(topicId){
   openModal("topicEditModal");
 }
 
+/* ---------------- backup and restore ---------------- */
+function downloadBackup(){
+  var data = JSON.stringify(state, null, 2);
+  var blob = new Blob([data], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = "okiedokie-slide-studio-backup-" + stamp + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function handleRestoreFile(file){
+  var reader = new FileReader();
+  reader.onload = function(){
+    var parsed;
+    try{ parsed = JSON.parse(reader.result); }
+    catch(e){ alert("That file could not be read. Please choose a Slide Studio backup file."); return; }
+    if(!parsed || !parsed.subjects || !parsed.topics || !parsed.slides){
+      alert("That does not look like a Slide Studio backup file.");
+      return;
+    }
+    askConfirm("Restore this backup? It will replace everything currently in Slide Studio.", function(){
+      parsed.topics.forEach(function(t){ if(!t.levels){ t.levels = t.level ? [t.level] : ["P5"]; } });
+      state = parsed;
+      ui.subjectId = state.subjects[0] ? state.subjects[0].id : null;
+      ui.topicId = null;
+      ui.slidePage = 0;
+      saveState();
+      renderSubjectTabs();
+      renderLevelTabs();
+      renderTopicPills();
+    });
+  };
+  reader.readAsText(file);
+}
+
 /* ---------------- search ---------------- */
 function runSearch(query){
   var box = document.getElementById("searchResults");
@@ -1065,7 +1257,7 @@ function runSearch(query){
     var topic = getTopic(sl.topicId);
     if(!topic) return;
     var subject = getSubject(topic.subjectId);
-    var haystack = [sl.title, sl.body, sl.subtitle, sl.tryItOut, sl.caption, (sl.examples||[]).join(" "), (sl.bullets||[]).join(" "), topic.name, subject?subject.name:""].join(" ").toLowerCase();
+    var haystack = [sl.title, sl.body, sl.subtitle, sl.tryItOut, sl.caption, (sl.examples||[]).join(" "), (sl.bullets||[]).join(" "), (sl.chips||[]).join(" "), topic.name, subject?subject.name:""].join(" ").toLowerCase();
     if(haystack.indexOf(query) > -1){
       results.push({ slide: sl, topic: topic, subject: subject });
     }
@@ -1097,10 +1289,22 @@ document.addEventListener("click", function(e){
     return;
   }
 
+  var swatchEl = t.closest(".ft-swatch, .ft-clear");
+  if(swatchEl){
+    var col = swatchEl.getAttribute("data-applycolor");
+    applyFormatToSelection(col === "clear" ? { color:"var(--ink)", textDecoration:"none" } : { color: col });
+    return;
+  }
+  if(t.closest("#ftStrikeBtn")){
+    applyFormatToSelection({ textDecoration: "line-through" });
+    return;
+  }
+
   var subEl = t.closest("[data-subject]");
   if(subEl){
     ui.subjectId = subEl.getAttribute("data-subject");
     ui.topicId = null;
+    ui.slidePage = 0;
     renderSubjectTabs();
     renderTopicPills();
     return;
@@ -1112,6 +1316,7 @@ document.addEventListener("click", function(e){
       state.subjects.push(sub);
       ui.subjectId = sub.id;
       ui.topicId = null;
+      ui.slidePage = 0;
       saveState();
       renderSubjectTabs();
       renderTopicPills();
@@ -1123,6 +1328,7 @@ document.addEventListener("click", function(e){
   if(lvlEl){
     ui.level = lvlEl.getAttribute("data-level");
     ui.topicId = null;
+    ui.slidePage = 0;
     renderLevelTabs();
     renderTopicPills();
     return;
@@ -1145,17 +1351,20 @@ document.addEventListener("click", function(e){
     return;
   }
 
-  var swatchEl = t.closest(".ct-swatch");
-  if(swatchEl){
-    var col = swatchEl.getAttribute("data-applycolor");
-    applyColorToSelection(col === "clear" ? "var(--ink)" : col);
+  var typeCardEl = t.closest("[data-typekey]");
+  if(typeCardEl){
+    var tkey = typeCardEl.getAttribute("data-typekey");
+    var tpos = ui.addSlidesSelection.indexOf(tkey);
+    if(tpos > -1){ ui.addSlidesSelection.splice(tpos,1); } else { ui.addSlidesSelection.push(tkey); }
+    renderTypeGrid();
     return;
   }
+  if(t.id === "useDefaultBtn"){ ui.addSlidesSelection = DEFAULT_BUNDLE.slice(); renderTypeGrid(); return; }
+  if(t.id === "clearAllBtn"){ ui.addSlidesSelection = []; renderTypeGrid(); return; }
+  if(t.id === "createSlidesBtn"){ createSlidesBatch(); return; }
+  if(t.id === "addSlideBtn"){ openAddSlidesModal(); return; }
 
-  if(t.id === "f_chipadd"){
-    addChip();
-    return;
-  }
+  if(t.id === "f_chipadd"){ addChip(); return; }
   var removeChipEl = t.closest("[data-removechip]");
   if(removeChipEl){
     var chipIdx = parseInt(removeChipEl.getAttribute("data-removechip"),10);
@@ -1164,7 +1373,6 @@ document.addEventListener("click", function(e){
     renderEditorPreview();
     return;
   }
-
   var addItemEl = t.closest("[data-additem]");
   if(addItemEl){
     var addKey = addItemEl.getAttribute("data-additem");
@@ -1184,23 +1392,14 @@ document.addEventListener("click", function(e){
     return;
   }
 
-  if(t.id === "viewerClose" || t.id === "viewerOverlay"){
-    closeViewer();
-    return;
-  }
-  if(t.id === "viewerPrev"){
-    if(viewerIndex > 0){ viewerIndex--; renderViewer(); }
-    return;
-  }
-  if(t.id === "viewerNext"){
-    if(viewerIndex < viewerSlides.length - 1){ viewerIndex++; renderViewer(); }
-    return;
-  }
+  if(t.id === "viewerClose" || t.id === "viewerOverlay"){ closeViewer(); return; }
+  if(t.id === "viewerPrev"){ if(viewerIndex > 0){ viewerIndex--; renderViewer(); } return; }
+  if(t.id === "viewerNext"){ if(viewerIndex < viewerSlides.length - 1){ viewerIndex++; renderViewer(); } return; }
   var viewEl = t.closest("[data-view]");
-  if(viewEl){
-    openViewer(viewEl.getAttribute("data-view"));
-    return;
-  }
+  if(viewEl){ openViewer(viewEl.getAttribute("data-view")); return; }
+
+  if(t.id === "pagePrevBtn"){ ui.slidePage--; renderMain(); return; }
+  if(t.id === "pageNextBtn"){ ui.slidePage++; renderMain(); return; }
 
   var printOneEl = t.closest("[data-printone]");
   if(printOneEl){
@@ -1238,17 +1437,8 @@ document.addEventListener("click", function(e){
   var topicEl = t.closest("[data-topic]");
   if(topicEl){
     ui.topicId = topicEl.getAttribute("data-topic");
+    ui.slidePage = 0;
     renderTopicPills();
-    return;
-  }
-
-  if(t.id === "addSlideBtn"){
-    pickTemplateThenOpen();
-    return;
-  }
-  var tplChooseEl = t.closest("[data-tplchoose]");
-  if(tplChooseEl){
-    openEditorFor(tplChooseEl.getAttribute("data-tplchoose"), null);
     return;
   }
 
@@ -1259,10 +1449,7 @@ document.addEventListener("click", function(e){
     return;
   }
 
-  if(t.id === "saveSlideBtn"){
-    saveEditorSlide();
-    return;
-  }
+  if(t.id === "saveSlideBtn"){ saveEditorSlide(); return; }
 
   if(t.id === "saveTopicBtn"){
     var topic3 = getTopic(ui.editingTopicId);
@@ -1300,11 +1487,15 @@ document.addEventListener("click", function(e){
     return;
   }
 
+  if(t.id === "backupBtn"){ downloadBackup(); return; }
+  if(t.id === "restoreBtn"){ document.getElementById("restoreFileInput").click(); return; }
+
   var jumpEl = t.closest("[data-jump]");
   if(jumpEl){
     ui.subjectId = jumpEl.getAttribute("data-jumpsub");
     ui.level = jumpEl.getAttribute("data-jumplevel");
     ui.topicId = jumpEl.getAttribute("data-jumptopic");
+    ui.slidePage = 0;
     renderSubjectTabs();
     renderLevelTabs();
     renderTopicPills();
@@ -1331,6 +1522,7 @@ function addTopicHandler(){
   var topic = { id: uid("topic"), subjectId: ui.subjectId, levels: ui.newTopicLevels.slice(), name: name };
   state.topics.push(topic);
   ui.topicId = topic.id;
+  ui.slidePage = 0;
   input.value = "";
   saveState();
   renderTopicPills();
@@ -1340,9 +1532,17 @@ document.getElementById("searchInput").addEventListener("input", function(e){
   runSearch(e.target.value);
 });
 
+document.getElementById("restoreFileInput").addEventListener("change", function(e){
+  var f = e.target.files[0];
+  if(f) handleRestoreFile(f);
+  e.target.value = "";
+});
+
 /* ---------------- init ---------------- */
 function init(){
   document.getElementById("searchIconSlot").innerHTML = icon("search",15);
+  document.getElementById("backupBtn").innerHTML = icon("download",14) + " Backup";
+  document.getElementById("restoreBtn").innerHTML = icon("upload",14) + " Restore";
   renderSubjectTabs();
   renderLevelTabs();
   renderTopicPills();
