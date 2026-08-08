@@ -692,6 +692,15 @@ function topicsFor(subjectId, level){
 function slidesFor(topicId){
   return state.slides.filter(function(s){ return s.topicId === topicId; });
 }
+function duplicateSlide(id){
+  var idx = state.slides.findIndex(function(s){ return s.id === id; });
+  if(idx < 0) return;
+  var copy = JSON.parse(JSON.stringify(state.slides[idx]));
+  copy.id = uid("slide");
+  state.slides.splice(idx + 1, 0, copy);
+  saveState();
+  renderMain();
+}
 function moveSlide(id, dir){
   var slide = state.slides.filter(function(s){return s.id===id;})[0];
   if(!slide) return;
@@ -817,6 +826,7 @@ function renderMain(){
       '</div>' +
       '<div class="card-actions">' +
         '<button class="icon-btn print-btn" title="Print this slide" data-printone="' + sl.id + '">' + icon("print",13) + '</button>' +
+        '<button class="icon-btn edit-btn" title="Duplicate this slide" data-dupslide="' + sl.id + '">' + icon("copy",13) + '</button>' +
         '<button class="icon-btn edit-btn" title="Edit" data-edit="' + sl.id + '">' + icon("edit",13) + '</button>' +
         '<button class="icon-btn del-btn" title="Delete" data-delslide="' + sl.id + '">' + icon("trash",13) + '</button>' +
       '</div>' +
@@ -1674,6 +1684,12 @@ document.addEventListener("click", function(e){
     var pid = printOneEl.getAttribute("data-printone");
     var psl = state.slides.filter(function(s){return s.id===pid;})[0];
     if(psl) printSlides([psl], getTopic(psl.topicId));
+    return;
+  }
+
+  var dupSlideEl = t.closest("[data-dupslide]");
+  if(dupSlideEl){
+    duplicateSlide(dupSlideEl.getAttribute("data-dupslide"));
     return;
   }
 
