@@ -134,6 +134,7 @@ svg{display:block;}
 .icon-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.12);}
 .icon-btn.edit-btn{color:var(--navy);}
 .icon-btn.print-btn{color:var(--green-deep);}
+.icon-btn.dup-btn{color:var(--purple-deep);}
 .icon-btn.del-btn{color:var(--pink-deep);}
 .slide-card .slide-canvas{cursor:pointer;}
 .slide-card .card-foot{padding:8px 12px 10px;font-size:11.5px;color:var(--ink-soft);font-weight:700;display:flex;justify-content:space-between;}
@@ -309,6 +310,13 @@ svg{display:block;}
 .item-row{display:flex;gap:8px;align-items:flex-start;}
 .item-del{width:36px;height:36px;flex-shrink:0;border-radius:10px;background:var(--cream);color:var(--pink-deep);display:flex;align-items:center;justify-content:center;}
 .item-del:hover{background:var(--pink);}
+.item-move-group{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
+.item-move{width:22px;height:17px;border-radius:6px;background:var(--cream);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;}
+.item-move:hover{background:var(--blue-bg);color:var(--navy);}
+.item-move:disabled{opacity:.25;}
+.chip-move{width:16px;height:16px;border-radius:5px;background:rgba(0,0,0,.05);color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chip-move:hover{background:rgba(0,0,0,.1);}
+.chip-move:disabled{opacity:.2;}
 .table-rows-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
 .table-row-editor{border:2px solid var(--card-border);border-radius:12px;padding:10px 12px;}
 .table-row-editor .tre-top{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
@@ -564,7 +572,10 @@ function icon(name, size){
     chevronLeft: '<polyline points="15 18 9 12 15 6"/>',
     chevronRight: '<polyline points="9 18 15 12 9 6"/>',
     strike: '<path d="M6 4h8a3 3 0 0 1 2.5 4.5"/><path d="M18 20H8a3 3 0 0 1-2.7-4.4"/><line x1="3" y1="12" x2="21" y2="12"/>',
-    table: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>'
+    table: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>',
+    copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    chevronUp: '<polyline points="18 15 12 9 6 15"/>',
+    chevronDown: '<polyline points="6 9 12 15 18 9"/>'
   }[name] || '';
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
 }
@@ -846,6 +857,7 @@ function renderMain(){
     html += '<div class="slide-card">' +
       '<div class="card-actions">' +
         '<button class="icon-btn print-btn" title="Print this slide" data-printone="' + sl.id + '">' + icon("print",13) + '</button>' +
+        '<button class="icon-btn dup-btn" title="Duplicate this slide" data-duplicate="' + sl.id + '">' + icon("copy",13) + '</button>' +
         '<button class="icon-btn edit-btn" title="Edit" data-edit="' + sl.id + '">' + icon("edit",13) + '</button>' +
         '<button class="icon-btn del-btn" title="Delete" data-delslide="' + sl.id + '">' + icon("trash",13) + '</button>' +
       '</div>' +
@@ -1117,15 +1129,29 @@ function richField(key, index, placeholder, value, extraClass){
     ' data-placeholder="' + escapeHtml(placeholder) + '">' + (value || "") + '</div>';
 }
 
+function moveArrowsHtml(key, i, len){
+  return '<div class="item-move-group">' +
+    '<button type="button" class="item-move" data-moveitem="' + key + '" data-index="' + i + '" data-dir="up" title="Move up"' + (i===0?' disabled':'') + '>' + icon("chevronUp",12) + '</button>' +
+    '<button type="button" class="item-move" data-moveitem="' + key + '" data-index="' + i + '" data-dir="down" title="Move down"' + (i===len-1?' disabled':'') + '>' + icon("chevronDown",12) + '</button>' +
+    '</div>';
+}
+function moveArrayItem(arr, index, dir){
+  if(!arr) return;
+  var to = dir === "up" ? index - 1 : index + 1;
+  if(to < 0 || to >= arr.length) return;
+  var tmp = arr[index];
+  arr[index] = arr[to];
+  arr[to] = tmp;
+}
 function itemListField(key, label, placeholder, addLabel){
   var arr = editorDraft[key] || [];
   var html = '<div class="form-field"><label>' + escapeHtml(label) + ' (optional)</label><div class="item-list">';
   arr.forEach(function(val, i){
-    html += '<div class="item-row">' + richField(key, i, placeholder, val, "item-field") +
+    html += '<div class="item-row">' + moveArrowsHtml(key, i, arr.length) + richField(key, i, placeholder, val, "item-field") +
       '<button type="button" class="item-del" data-removeitem="' + key + '" data-index="' + i + '" title="Remove">' + icon("trash",13) + '</button></div>';
   });
   html += '</div><button type="button" class="btn btn-outline btn-sm" data-additem="' + key + '">' + icon("plusCircle",14) + ' ' + escapeHtml(addLabel) + '</button>' +
-    '<div class="hint">Select text and use the toolbar that appears to colour or strike it. Enter makes a line break in the same box, use "' + escapeHtml(addLabel) + '" to start a new one.</div></div>';
+    '<div class="hint">Select text and use the toolbar that appears to colour or strike it. Enter makes a line break in the same box, use "' + escapeHtml(addLabel) + '" to start a new one. Use the arrows to reorder.</div></div>';
   return html;
 }
 
@@ -1136,7 +1162,7 @@ function renderTableRowsField(){
   var html = '<div class="form-field"><label>Table rows</label><div class="table-rows-list" id="tableRowsList">';
   rows.forEach(function(r,i){
     html += '<div class="table-row-editor" data-rowindex="' + i + '">' +
-      '<div class="tre-top">' +
+      '<div class="tre-top">' + moveArrowsHtml("tableRows", i, rows.length) +
         '<input type="text" class="tre-form" data-rowfield="form" data-index="' + i + '" value="' + escapeHtml(r.form) + '" placeholder="e.g. Is">' +
         '<button type="button" class="item-del" data-removerow="' + i + '" title="Remove">' + icon("trash",13) + '</button>' +
       '</div>' +
@@ -1226,14 +1252,18 @@ function renderCompareTableField(){
   html += '<div class="compare-editor-row compare-editor-head">';
   html += '<div class="compare-editor-corner"></div>';
   cols.forEach(function(c, ci){
-    html += '<div class="compare-editor-cell"><input type="text" class="compare-col-input" data-colindex="' + ci + '" value="' + escapeHtml(c) + '" placeholder="Column name">' +
+    html += '<div class="compare-editor-cell">' +
+      '<button type="button" class="chip-move" data-movecol data-index="' + ci + '" data-dir="up" title="Move left"' + (ci===0?' disabled':'') + '>' + icon("chevronUp",10) + '</button>' +
+      '<button type="button" class="chip-move" data-movecol data-index="' + ci + '" data-dir="down" title="Move right"' + (ci===cols.length-1?' disabled':'') + '>' + icon("chevronDown",10) + '</button>' +
+      '<input type="text" class="compare-col-input" data-colindex="' + ci + '" value="' + escapeHtml(c) + '" placeholder="Column name">' +
       (cols.length > 1 ? '<button type="button" class="item-del compare-del-col" data-delcol="' + ci + '" title="Remove column">' + icon("trash",12) + '</button>' : '') + '</div>';
   });
   html += '<button type="button" class="btn btn-outline btn-sm" id="addCompareColBtn">' + icon("plusCircle",13) + ' Column</button>';
   html += '</div>';
   rows.forEach(function(r, ri){
     html += '<div class="compare-editor-row">';
-    html += '<div class="compare-editor-corner"><input type="text" class="compare-row-input" data-rowindex="' + ri + '" value="' + escapeHtml(r.label) + '" placeholder="Row name">' +
+    html += '<div class="compare-editor-corner">' + moveArrowsHtml("compareRows", ri, rows.length) +
+      '<input type="text" class="compare-row-input" data-rowindex="' + ri + '" value="' + escapeHtml(r.label) + '" placeholder="Row name">' +
       (rows.length > 1 ? '<button type="button" class="item-del compare-del-row" data-delrow="' + ri + '" title="Remove row">' + icon("trash",12) + '</button>' : '') + '</div>';
     (r.cells || []).forEach(function(cellVal, ci){
       html += '<div class="compare-editor-cell"><input type="text" class="compare-cell-input" data-rowindex="' + ri + '" data-colindex="' + ci + '" value="' + escapeHtml(cellVal) + '" placeholder="..."></div>';
@@ -1249,10 +1279,12 @@ function renderFlowStepsField(){
   var steps = editorDraft.flowSteps || [];
   var html = '<div class="form-field"><label>Steps (shown joined by arrows, in this order)</label><div class="item-list" id="flowStepsList">';
   steps.forEach(function(s, i){
-    html += '<div class="item-row"><input type="text" class="flow-step-input" data-index="' + i + '" value="' + escapeHtml(s) + '" placeholder="Step text">' +
+    html += '<div class="item-row">' + moveArrowsHtml("flowSteps", i, steps.length) +
+      '<input type="text" class="flow-step-input" data-index="' + i + '" value="' + escapeHtml(s) + '" placeholder="Step text">' +
       '<button type="button" class="item-del" data-removeflowstep="' + i + '" title="Remove">' + icon("trash",13) + '</button></div>';
   });
-  html += '</div><button type="button" class="btn btn-outline btn-sm" id="addFlowStepBtn">' + icon("plusCircle",14) + ' Add step</button></div>';
+  html += '</div><button type="button" class="btn btn-outline btn-sm" id="addFlowStepBtn">' + icon("plusCircle",14) + ' Add step</button>' +
+    '<div class="hint">Use the arrows to reorder the steps</div></div>';
   return html;
 }
 
@@ -1262,9 +1294,12 @@ function renderChipsField(){
     '<div class="chip-input-row"><input type="text" id="f_chipinput" placeholder="Type a word, then press enter"><button type="button" class="btn btn-outline btn-sm" id="f_chipadd">Add</button></div>' +
     '<div class="chip-list">';
   arr.forEach(function(w,i){
-    html += '<span class="chip-tag">' + escapeHtml(w) + '<button type="button" class="chip-remove" data-removechip="' + i + '">&times;</button></span>';
+    html += '<span class="chip-tag">' +
+      '<button type="button" class="chip-move" data-movechip data-index="' + i + '" data-dir="up" title="Move earlier"' + (i===0?' disabled':'') + '>' + icon("chevronUp",10) + '</button>' +
+      '<button type="button" class="chip-move" data-movechip data-index="' + i + '" data-dir="down" title="Move later"' + (i===arr.length-1?' disabled':'') + '>' + icon("chevronDown",10) + '</button>' +
+      escapeHtml(w) + '<button type="button" class="chip-remove" data-removechip="' + i + '">&times;</button></span>';
   });
-  html += '</div></div>';
+  html += '</div><div class="hint">Use the small arrows on a word to reorder it</div></div>';
   return html;
 }
 
@@ -1849,6 +1884,38 @@ document.addEventListener("click", function(e){
     renderEditorPreview();
     return;
   }
+  var moveItemEl = t.closest("[data-moveitem]");
+  if(moveItemEl){
+    var mvKey = moveItemEl.getAttribute("data-moveitem");
+    var mvIdx = parseInt(moveItemEl.getAttribute("data-index"),10);
+    var mvDir = moveItemEl.getAttribute("data-dir");
+    moveArrayItem(editorDraft[mvKey], mvIdx, mvDir);
+    renderEditorFields();
+    renderEditorPreview();
+    return;
+  }
+  var moveChipEl = t.closest("[data-movechip]");
+  if(moveChipEl){
+    var chIdx = parseInt(moveChipEl.getAttribute("data-index"),10);
+    var chDir = moveChipEl.getAttribute("data-dir");
+    moveArrayItem(editorDraft.chips, chIdx, chDir);
+    renderEditorFields();
+    renderEditorPreview();
+    return;
+  }
+  var moveColEl = t.closest("[data-movecol]");
+  if(moveColEl){
+    var colIdx = parseInt(moveColEl.getAttribute("data-index"),10);
+    var colDir = moveColEl.getAttribute("data-dir");
+    var toIdx = colDir === "up" ? colIdx - 1 : colIdx + 1;
+    if(toIdx >= 0 && toIdx < editorDraft.compareCols.length){
+      moveArrayItem(editorDraft.compareCols, colIdx, colDir);
+      (editorDraft.compareRows||[]).forEach(function(r){ moveArrayItem(r.cells, colIdx, colDir); });
+    }
+    renderEditorFields();
+    renderEditorPreview();
+    return;
+  }
 
   if(t.id === "addCompareColBtn"){
     editorDraft.compareCols = editorDraft.compareCols || [];
@@ -1939,6 +2006,20 @@ document.addEventListener("click", function(e){
     var pid = printOneEl.getAttribute("data-printone");
     var psl = state.slides.filter(function(s){return s.id===pid;})[0];
     if(psl) printSlides([psl], getTopic(psl.topicId));
+    return;
+  }
+
+  var dupEl = t.closest("[data-duplicate]");
+  if(dupEl){
+    var dupId = dupEl.getAttribute("data-duplicate");
+    var origIdx = state.slides.findIndex(function(s){return s.id===dupId;});
+    if(origIdx > -1){
+      var clone = JSON.parse(JSON.stringify(state.slides[origIdx]));
+      clone.id = uid("slide");
+      state.slides.splice(origIdx+1, 0, clone);
+      saveState();
+      renderMain();
+    }
     return;
   }
 
