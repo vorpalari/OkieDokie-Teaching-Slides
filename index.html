@@ -199,7 +199,7 @@ svg{display:block;}
 .compact-header h2{font-size:5cqw;color:var(--ink);line-height:1.16;overflow-wrap:break-word;word-break:break-word;}
 
 .content-zone{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;gap:2.2cqw;overflow:hidden;min-height:0;}
-.card-block{background:#fff;border-radius:3cqw;padding:3.6cqw 4.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.card-block{background:#fff;border-radius:3cqw;padding:3.6cqw 4.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);flex:1;display:flex;flex-direction:column;justify-content:center;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
 .card-block.rule-card{background:linear-gradient(145deg, #ffffff 0%, var(--bg) 145%);}
 .rule-icon-badge{width:9cqw;height:9cqw;min-width:9cqw;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:2.6cqw;box-shadow:0 .6cqw 1.4cqw rgba(35,25,55,.16);flex-shrink:0;}
 .rule-icon-badge svg{width:55%;height:55%;display:block;}
@@ -280,7 +280,13 @@ svg{display:block;}
 .duotext-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.4cqw;}
 .duotext-label{align-self:flex-start;background:var(--accent);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:2.4cqw;padding:.9cqw 2.6cqw;border-radius:20px;flex-shrink:0;}
 .duotext-label-alt{background:var(--ink);opacity:.85;}
-.duotext-box{background:#fff;border-radius:2.6cqw;padding:3cqw 3.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);flex:1;overflow:hidden;min-height:0;}
+.duotext-box{background:#fff;border-radius:2.6cqw;padding:3cqw 3.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);flex:1;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
+
+/* full single passage (e.g. one complete situational email or article) */
+.passage-box{background:#fff;border-radius:3cqw;padding:3.6cqw 4.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.passage-label{align-self:flex-start;background:var(--accent);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:2.2cqw;padding:.8cqw 2.4cqw;border-radius:20px;margin-bottom:2cqw;flex-shrink:0;}
+.passage-text-scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.passage-text{font-size:3cqw;font-weight:600;line-height:1.55;color:var(--ink);white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;}
 .duotext-text{font-size:2.6cqw;font-weight:600;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;}
 
 /* photos-only slide */
@@ -667,6 +673,7 @@ var TEMPLATES = {
   flow:      { icon:"list",      name:"Flow / arrows",    desc:"A sequence of steps joined by arrows" },
   freenotes: { icon:"list",      name:"Stacked notes",    desc:"Add as many or as few note cards as you like, fills the space" },
   duotext:   { icon:"list",      name:"Side by side text", desc:"Two longer passages side by side, e.g. formal vs informal writing" },
+  passage:   { icon:"book",      name:"Full passage",     desc:"One full piece of writing, e.g. a complete situational email or article" },
   photos:    { icon:"image",     name:"Photos",           desc:"Just pictures - add one or more images, no text needed" }
 };
 var DEFAULT_BUNDLE = [];
@@ -721,6 +728,8 @@ function normalizeState(){
     if(s.rightLabel === undefined) s.rightLabel = "Informal";
     if(s.rightText === undefined) s.rightText = "";
     if(!s.photos) s.photos = [];
+    if(s.passageLabel === undefined) s.passageLabel = "";
+    if(s.passageText === undefined) s.passageText = "";
     ["title","subtitle"].forEach(function(k){
       if(s[k] && s[k].indexOf("<") === -1){
         s[k] = escapeHtml(s[k]).replace(/\n/g,"<br>");
@@ -1147,6 +1156,20 @@ function renderSlideInner(sl, topic){
       '</div>';
   }
 
+  if(sl.template === "passage"){
+    var passageHtml = sl.passageText && !isBlankRichSafe(sl.passageText) ? sanitizeRichHtml(sl.passageText) : '<span class="imgtext-empty-hint">Add the passage in the editor</span>';
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header">' +
+        (sl.badgeText && sl.badgeText.trim() ? '<div class="type-badge">' + escapeHtml(sl.badgeText) + '</div>' : '') +
+        '<h2>' + sanitizeRichHtml(sl.title) + '</h2>' +
+      '</div>' +
+      '<div class="content-zone"><div class="passage-box">' +
+        (sl.passageLabel && sl.passageLabel.trim() ? '<div class="passage-label">' + escapeHtml(sl.passageLabel) + '</div>' : '') +
+        '<div class="passage-text-scroll"><div class="passage-text">' + passageHtml + '</div></div>' +
+      '</div></div>' +
+      '</div>';
+  }
+
   if(sl.template === "photos"){
     var photos = sl.photos || [];
     var photosHtml = photos.length ?
@@ -1197,7 +1220,7 @@ function renderTypeGrid(){
   createBtn.disabled = n===0;
 }
 function blankSlideOfType(key){
-  var placeholderTitles = { title:"New title slide", tryitout:"Try it out", rule:"New rule", examples:"Examples", wordlist:"Word list", imagetext:"New picture slide", list:"Key points", table:"Verb table", compare:"Comparison", flow:"Steps", freenotes:"Notes", duotext:"Formal vs Informal", photos:"Photos" };
+  var placeholderTitles = { title:"New title slide", tryitout:"Try it out", rule:"New rule", examples:"Examples", wordlist:"Word list", imagetext:"New picture slide", list:"Key points", table:"Verb table", compare:"Comparison", flow:"Steps", freenotes:"Notes", duotext:"Formal vs Informal", photos:"Photos", passage:"Model Answer" };
   return {
     id: uid("slide"),
     topicId: ui.topicId,
@@ -1226,7 +1249,9 @@ function blankSlideOfType(key){
     leftText: "",
     rightLabel: "Informal",
     rightText: "",
-    photos: []
+    photos: [],
+    passageLabel: "",
+    passageText: ""
   };
 }
 /* Moves a slide earlier/later among the slides belonging to the SAME topic.
@@ -1296,6 +1321,7 @@ function fieldsForTemplate(t){
     case "flow": return ["title","badgeText","flowSteps","color"];
     case "freenotes": return ["title","notesItems","color"];
     case "duotext": return ["title","badgeText","duotext","color"];
+    case "passage": return ["title","badgeText","passage","color"];
     case "photos": return ["title","photosField","color"];
     default: return ["title","color"];
   }
@@ -1400,6 +1426,11 @@ function renderEditorFields(){
       html += '<div class="hint">Select text in either passage to colour, resize or strike it. Enter makes a new line.</div>';
     } else if(f === "photosField"){
       html += renderPhotosField();
+    } else if(f === "passage"){
+      html += '<div class="form-field"><label>Label (optional)</label>' +
+        '<input type="text" id="f_passagelabel" value="' + escapeHtml(editorDraft.passageLabel || "") + '" placeholder="e.g. Formal Email"></div>';
+      html += '<div class="form-field"><label>Passage</label>' + richField("passageText", null, "Type or paste the full passage here", editorDraft.passageText) +
+        '<div class="hint">This box scrolls, so a full email or article will always fit. Select text to colour, resize or strike it. Enter makes a new line.</div></div>';
     } else if(f === "tableRows"){
       html += renderTableRowsField();
     } else if(f === "compareTable"){
@@ -1585,6 +1616,7 @@ function attachFieldListeners(){
   bindText("f_badgetext","badgeText");
   bindText("f_leftlabel","leftLabel");
   bindText("f_rightlabel","rightLabel");
+  bindText("f_passagelabel","passageLabel");
 
   var valignWrap = document.getElementById("f_valign");
   if(valignWrap){
@@ -1806,6 +1838,13 @@ function replaceSelectionWithNode(range, node){
    ancestor spans (this happens when the selection matched an existing
    formatted span exactly), those ancestors are now empty wrappers doing
    nothing useful, so we lift our node out of them to keep the markup tidy. */
+/* If our newly inserted node ends up as the sole content of one or more
+   ancestor spans (this happens when the selection matched an existing
+   formatted span exactly), those ancestors are now empty wrappers. We lift
+   our node out of them to keep the markup tidy - but critically, we first
+   copy across any style properties the ancestor set that our node does NOT
+   already set itself (e.g. the ancestor had colour, we just added underline)
+   so that earlier formatting is preserved instead of silently discarded. */
 function unwrapEmptyAncestorSpans(node, root){
   var parent = node.parentNode;
   while(parent && parent !== root && parent.tagName === "SPAN"){
@@ -1816,6 +1855,14 @@ function unwrapEmptyAncestorSpans(node, root){
       else if(c.nodeType === 1) hasOtherContent = true;
     });
     if(hasOtherContent) break;
+    if(parent.style){
+      for(var i=0; i<parent.style.length; i++){
+        var prop = parent.style[i];
+        if(!node.style.getPropertyValue(prop)){
+          node.style.setProperty(prop, parent.style.getPropertyValue(prop));
+        }
+      }
+    }
     var grandparent = parent.parentNode;
     if(!grandparent) break;
     grandparent.insertBefore(node, parent);
@@ -1920,6 +1967,8 @@ function cleanBeforeSave(){
   if(editorDraft.rightText !== undefined) editorDraft.rightText = sanitizeRichHtml(editorDraft.rightText);
   if(editorDraft.leftLabel !== undefined) editorDraft.leftLabel = editorDraft.leftLabel.trim();
   if(editorDraft.rightLabel !== undefined) editorDraft.rightLabel = editorDraft.rightLabel.trim();
+  if(editorDraft.passageText !== undefined) editorDraft.passageText = sanitizeRichHtml(editorDraft.passageText);
+  if(editorDraft.passageLabel !== undefined) editorDraft.passageLabel = editorDraft.passageLabel.trim();
   if(editorDraft.body !== undefined) editorDraft.body = sanitizeRichHtml(editorDraft.body);
   if(editorDraft.tryItOut !== undefined) editorDraft.tryItOut = sanitizeRichHtml(editorDraft.tryItOut);
   if(editorDraft.examples){
@@ -2088,6 +2137,7 @@ function runSearch(query){
       (sl.compareCols||[]).join(" "),
       (sl.compareRows||[]).map(function(r){ return r.label + " " + (r.cells||[]).join(" "); }).join(" "),
       sl.leftLabel, sl.leftText, sl.rightLabel, sl.rightText,
+      sl.passageLabel, sl.passageText,
       topic.name, subject?subject.name:""
     ].join(" ").toLowerCase();
     if(haystack.indexOf(query) > -1){
