@@ -805,6 +805,42 @@ async function boot(){
   renderLevelTabs();
   renderTopicPills();
 }
+/* Photos straight from a phone camera are routinely 3-15MB, far bigger than
+   anything a slide needs. Rather than rejecting normal photos with a strict
+   size limit, we downscale and re-compress every uploaded image client-side
+   before storing it, so any photo someone takes "just works" while what
+   actually gets saved stays small and fast to sync. */
+function compressImageFile(file, maxDim, quality){
+  maxDim = maxDim || 1600;
+  quality = quality || 0.82;
+  return new Promise(function(resolve){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var original = e.target.result;
+      var img = new Image();
+      img.onload = function(){
+        try{
+          var w = img.naturalWidth || img.width;
+          var h = img.naturalHeight || img.height;
+          var scale = Math.min(1, maxDim / Math.max(w, h));
+          var canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(w * scale));
+          canvas.height = Math.max(1, Math.round(h * scale));
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          var dataUrl = canvas.toDataURL("image/jpeg", quality);
+          resolve(dataUrl && dataUrl.length > 100 ? dataUrl : original);
+        }catch(err){
+          resolve(original);
+        }
+      };
+      img.onerror = function(){ resolve(original); };
+      img.src = original;
+    };
+    reader.onerror = function(){ resolve(null); };
+    reader.readAsDataURL(file);
+  });
+}
 function uid(prefix){
   return prefix + "_" + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
 }
@@ -1519,7 +1555,7 @@ function renderPhotosField(){
     html += '</div>';
   }
   html += '<input type="file" id="f_photosinput" accept="image/*" multiple>' +
-    '<div class="hint">Add as many photos as you like. Use the arrows to reorder them.</div></div>';
+    '<div class="hint">Add as many photos as you like, straight from your camera roll. They\'re resized automatically so they save quickly. Use the arrows to reorder them.</div></div>';
   return html;
 }
 function renderFlowStepsField(){
@@ -1647,20 +1683,23 @@ function attachFieldListeners(){
     imgInput.addEventListener("change", function(){
       var file = imgInput.files[0];
       if(!file) return;
-      if(file.size > 4*1024*1024){
-        alert("That image is quite large. Please choose one under 4MB so it saves smoothly.");
+      if(file.size > 30*1024*1024){
+        alert("That image is extremely large. Please choose a smaller photo.");
+        imgInput.value = "";
         return;
       }
-      var reader = new FileReader();
-      reader.onload = function(){
-        editorDraft.imageData = reader.result;
+      compressImageFile(file).then(function(dataUrl){
+        if(!dataUrl){
+          alert("That image couldn't be read. Please try a different photo.");
+          return;
+        }
+        editorDraft.imageData = dataUrl;
         editorDraft.imageZoom = 1;
         editorDraft.imagePosX = 50;
         editorDraft.imagePosY = 50;
         renderEditorPreview();
         renderEditorFields();
-      };
-      reader.readAsDataURL(file);
+      });
     });
   }
   var photosInput = document.getElementById("f_photosinput");
@@ -1668,20 +1707,14 @@ function attachFieldListeners(){
     photosInput.addEventListener("change", function(){
       var files = Array.prototype.slice.call(photosInput.files || []);
       if(!files.length) return;
-      var tooLarge = files.some(function(f){ return f.size > 4*1024*1024; });
-      if(tooLarge){
-        alert("One or more photos are quite large. Please choose images under 4MB each so they save smoothly.");
+      var tooLarge = files.filter(function(f){ return f.size > 30*1024*1024; });
+      if(tooLarge.length){
+        alert("One or more photos are extremely large and were skipped. Please choose smaller photos.");
       }
-      var okFiles = files.filter(function(f){ return f.size <= 4*1024*1024; });
-      var readers = okFiles.map(function(f){
-        return new Promise(function(resolve){
-          var reader = new FileReader();
-          reader.onload = function(){ resolve(reader.result); };
-          reader.readAsDataURL(f);
-        });
-      });
-      Promise.all(readers).then(function(results){
-        editorDraft.photos = (editorDraft.photos || []).concat(results);
+      var okFiles = files.filter(function(f){ return f.size <= 30*1024*1024; });
+      Promise.all(okFiles.map(function(f){ return compressImageFile(f); })).then(function(results){
+        var goodResults = results.filter(Boolean);
+        editorDraft.photos = (editorDraft.photos || []).concat(goodResults);
         renderEditorPreview();
         renderEditorFields();
       });
