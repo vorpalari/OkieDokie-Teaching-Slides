@@ -741,12 +741,12 @@ function normalizeState(){
     if(s.passageText === undefined) s.passageText = "";
     ["title","subtitle"].forEach(function(k){
       if(s[k] && s[k].indexOf("<") === -1){
-        s[k] = escapeHtml(s[k]).replace(/\n/g,"<br>");
+        s[k] = escapeHtml(decodeHtmlEntitiesFully(s[k])).replace(/\n/g,"<br>");
       }
     });
     if(s.flowSteps){
       s.flowSteps = s.flowSteps.map(function(step){
-        if(step && step.indexOf("<") === -1) return escapeHtml(step).replace(/\n/g,"<br>");
+        if(step && step.indexOf("<") === -1) return escapeHtml(decodeHtmlEntitiesFully(step)).replace(/\n/g,"<br>");
         return step;
       });
     }
@@ -754,6 +754,25 @@ function normalizeState(){
     if(s.imagePosX === undefined) s.imagePosX = 50;
     if(s.imagePosY === undefined) s.imagePosY = 50;
   });
+}
+/* Reverses HTML-entity escaping (e.g. turns "Let&amp;#39;s" back into "Let's"),
+   looping until nothing more changes. This exists to repair data that got
+   accidentally double or triple-escaped by an earlier version of this file's
+   migration code (which kept re-escaping already-escaped plain text on every
+   load). Using a <textarea> is deliberate: setting innerHTML on a textarea
+   decodes entities but never parses the content as markup, so any stray
+   "<" a title might legitimately contain is never mistaken for a real tag. */
+function decodeHtmlEntitiesFully(str){
+  if(!str || str.indexOf("&") === -1) return str;
+  var ta = document.createElement("textarea");
+  var current = str;
+  for(var i = 0; i < 8; i++){
+    ta.innerHTML = current;
+    var next = ta.value;
+    if(next === current) break;
+    current = next;
+  }
+  return current;
 }
 function isBlankRichSafe(html){
   try{
