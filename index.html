@@ -40,6 +40,24 @@ body{
   -webkit-touch-callout:none;
   touch-action:manipulation;
 }
+/* Dark mode: inverting the whole page is a simple, reliable way to get a
+   dark UI without hand-recolouring every component. Slide canvases (the
+   actual teaching material, meant for printing/students) get the exact
+   same filter applied a second time so the double-inversion cancels out
+   and they always render in their normal light colours, unaffected by
+   whichever theme the app chrome is in. */
+body.dark-mode{
+  background:var(--cream);
+  filter:invert(1) hue-rotate(180deg);
+}
+body.dark-mode .slide-canvas{
+  filter:invert(1) hue-rotate(180deg);
+}
+.dark-toggle{
+  width:38px;height:38px;border-radius:12px;background:#fff;border:2px solid var(--card-border);
+  display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex-shrink:0;
+}
+.dark-toggle:hover{border-color:var(--navy);color:var(--navy);}
 input,textarea{user-select:text;-webkit-user-select:text;}
 button{font-family:'Nunito',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;border:none;background:none;}
 h1,h2,h3{margin:0;font-family:'Fredoka One',sans-serif;font-weight:400;}
@@ -131,6 +149,9 @@ svg{display:block;}
 .slide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
 .slide-card{background:#fff;border-radius:var(--radius);border:2px solid var(--card-border);box-shadow:var(--shadow);overflow:hidden;position:relative;}
 .slide-card .card-actions{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:5;}
+.slide-card .slide-move-group{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:4px;z-index:5;}
+.slide-move-group .move-btn{width:26px;height:22px;}
+.slide-move-group .move-btn:disabled{opacity:.35;}
 .icon-btn{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.12);}
 .icon-btn.edit-btn{color:var(--navy);}
 .icon-btn.print-btn{color:var(--green-deep);}
@@ -169,37 +190,39 @@ svg{display:block;}
 
 .hero-card{position:relative;z-index:2;background:#fff;border-radius:4cqw;padding:4.4cqw 5.2cqw;box-shadow:0 1.4cqw 2.8cqw rgba(35,25,55,.08);flex-shrink:0;}
 .hero-card .eyebrow{font-size:2.3cqw;font-weight:800;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:1.2cqw;}
-.hero-card h1{font-size:8cqw;color:var(--ink);line-height:1.12;}
-.hero-card .subtitle{font-size:3cqw;font-weight:700;color:var(--ink-soft);margin-top:1.6cqw;line-height:1.4;}
+.hero-card h1{font-size:8cqw;color:var(--ink);line-height:1.12;overflow-wrap:break-word;word-break:break-word;}
+.hero-card .subtitle{font-size:3cqw;font-weight:700;color:var(--ink-soft);margin-top:1.6cqw;line-height:1.4;overflow-wrap:break-word;word-break:break-word;}
 
 .compact-header{position:relative;z-index:2;flex-shrink:0;margin-bottom:3.4cqw;}
 .compact-header .eyebrow{font-size:2.1cqw;font-weight:800;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:1.2cqw;opacity:.85;}
 .type-badge{display:inline-block;background:var(--accent);color:#fff;font-family:'Fredoka One',sans-serif;font-size:2.3cqw;padding:.9cqw 2.8cqw;border-radius:20px;margin-bottom:1.4cqw;}
-.compact-header h2{font-size:5cqw;color:var(--ink);line-height:1.16;}
+.compact-header h2{font-size:5cqw;color:var(--ink);line-height:1.16;overflow-wrap:break-word;word-break:break-word;}
 
 .content-zone{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;gap:2.2cqw;overflow:hidden;min-height:0;}
 .card-block{background:#fff;border-radius:3cqw;padding:3.6cqw 4.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
-.card-block .card-text{font-size:3.4cqw;font-weight:700;line-height:1.5;color:var(--ink);white-space:pre-wrap;}
+.card-block .card-text{font-size:3.4cqw;font-weight:700;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;max-width:100%;}
 
 .examples-row{display:flex;flex-direction:column;gap:1.7cqw;flex:1;overflow:hidden;justify-content:center;}
-.example-card{background:#fff;border-radius:2.6cqw;padding:2.3cqw 3cqw;display:flex;gap:2.2cqw;align-items:center;box-shadow:0 .8cqw 1.6cqw rgba(35,25,55,.05);flex-shrink:0;}
+.example-card{background:#fff;border-radius:2.6cqw;padding:2.3cqw 3cqw;display:flex;gap:2.2cqw;align-items:center;box-shadow:0 .8cqw 1.6cqw rgba(35,25,55,.05);flex-shrink:0;min-width:0;}
 .example-num{font-family:'Fredoka One',sans-serif;background:var(--accent);color:#fff;width:6cqw;height:6cqw;min-width:6cqw;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.9cqw;}
-.example-text{font-size:3.1cqw;font-weight:700;color:var(--ink);line-height:1.35;white-space:pre-wrap;}
+.example-text{font-size:3.1cqw;font-weight:700;color:var(--ink);line-height:1.35;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;min-width:0;flex:1;}
 
 /* image and text template */
 .imgtext-row{display:flex;gap:3cqw;flex:1;min-height:0;overflow:hidden;}
-.imgtext-row img{width:44%;height:100%;object-fit:cover;border-radius:3cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.08);}
-.imgtext-noimg{width:44%;height:100%;border-radius:3cqw;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5cqw;color:var(--ink-soft);font-weight:700;text-align:center;padding:2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);}
-.imgtext-row .card-block{flex:1;}
+.imgtext-frame{width:44%;height:100%;border-radius:3cqw;overflow:hidden;box-shadow:0 1cqw 2cqw rgba(35,25,55,.08);flex-shrink:0;}
+.imgtext-frame img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:center;}
+.imgtext-noimg{width:44%;height:100%;border-radius:3cqw;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5cqw;color:var(--ink-soft);font-weight:700;text-align:center;padding:2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);flex-shrink:0;}
+.imgtext-row .card-block{flex:1;min-width:0;}
 
 /* list template */
 .bullet-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.8cqw;overflow:hidden;}
-.bullet-list li{display:flex;gap:2.2cqw;align-items:flex-start;font-size:3.3cqw;font-weight:700;line-height:1.4;color:var(--ink);}
+.bullet-list li{display:flex;gap:2.2cqw;align-items:flex-start;font-size:3.3cqw;font-weight:700;line-height:1.4;color:var(--ink);min-width:0;}
+.bullet-list li span:last-child{overflow-wrap:break-word;word-break:break-word;min-width:0;}
 .bullet-list li .dot{width:2.6cqw;height:2.6cqw;min-width:2.6cqw;border-radius:50%;background:var(--accent);margin-top:1cqw;}
 
 /* word list / chips */
 .chips-row{display:flex;flex-wrap:wrap;gap:2cqw;flex:1;align-content:flex-start;overflow:hidden;}
-.chip-pill{background:#fff;border:.35cqw solid var(--accent);color:var(--accent);border-radius:1.8cqw;padding:1.8cqw 3.4cqw;font-size:3.2cqw;font-weight:800;box-shadow:0 .6cqw 1.2cqw rgba(35,25,55,.05);}
+.chip-pill{background:#fff;border:.35cqw solid var(--accent);color:var(--accent);border-radius:1.8cqw;padding:1.8cqw 3.4cqw;font-size:3.2cqw;font-weight:800;box-shadow:0 .6cqw 1.2cqw rgba(35,25,55,.05);overflow-wrap:break-word;word-break:break-word;max-width:100%;}
 
 /* verb table */
 .verb-table{width:100%;flex:1;display:flex;flex-direction:column;border-radius:3cqw;overflow:hidden;background:#fff;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);}
@@ -223,7 +246,7 @@ svg{display:block;}
 .imgtext-points{display:flex;flex-direction:column;gap:2cqw;justify-content:center;}
 .imgtext-points.va-top{justify-content:flex-start;}
 .imgtext-points.va-spread{justify-content:space-evenly;}
-.imgtext-item{font-size:3.2cqw;font-weight:700;line-height:1.4;color:var(--ink);white-space:pre-wrap;padding-bottom:1.4cqw;border-bottom:.2cqw solid var(--cream);}
+.imgtext-item{font-size:3.2cqw;font-weight:700;line-height:1.4;color:var(--ink);white-space:pre-wrap;padding-bottom:1.4cqw;border-bottom:.2cqw solid var(--cream);overflow-wrap:break-word;word-break:break-word;}
 .imgtext-item:last-child{border-bottom:none;padding-bottom:0;}
 .imgtext-empty-hint{opacity:.4;font-style:normal;}
 
@@ -241,7 +264,7 @@ svg{display:block;}
 /* flow / arrows */
 .flow-row{display:flex;flex:1;align-items:center;justify-content:center;flex-wrap:wrap;gap:1.4cqw;}
 .flow-box{background:#fff;border-radius:2.6cqw;padding:2.6cqw 3cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.07);border:.35cqw solid var(--accent);flex:1 1 0;min-width:16%;max-width:26%;}
-.flow-box-text{font-size:2.8cqw;font-weight:800;color:var(--ink);text-align:center;line-height:1.3;white-space:pre-wrap;}
+.flow-box-text{font-size:2.8cqw;font-weight:800;color:var(--ink);text-align:center;line-height:1.3;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;}
 .flow-arrow{color:var(--accent);flex-shrink:0;width:6cqw;display:flex;align-items:center;justify-content:center;}
 .flow-arrow svg{width:5cqw;height:5cqw;}
 
@@ -294,6 +317,11 @@ svg{display:block;}
 .theme-swatch.selected{border-color:var(--ink);}
 .img-upload-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .img-upload-row img{width:90px;height:66px;object-fit:cover;border-radius:10px;border:2px solid var(--card-border);}
+.crop-controls{margin-top:12px;padding:12px 14px;background:var(--cream);border-radius:12px;}
+.crop-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.crop-row:last-of-type{margin-bottom:4px;}
+.crop-row label{font-size:12px;font-weight:800;color:var(--ink-soft);width:120px;flex-shrink:0;}
+.crop-row input[type=range]{flex:1;}
 .editor-preview{margin-bottom:18px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;position:sticky;bottom:-26px;background:#fff;padding-top:12px;}
 .modal-foot.spread{justify-content:space-between;}
@@ -331,13 +359,16 @@ svg{display:block;}
 .chip-remove:hover{background:var(--pink);color:var(--pink-deep);}
 
 /* floating format toolbar, appears near selected text */
-.floating-toolbar{position:fixed;display:none;align-items:center;gap:6px;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(20,15,30,.25);padding:7px 8px;z-index:3000;border:2px solid var(--card-border);}
-.ft-swatch{width:26px;height:26px;border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 2px var(--card-border);}
+.floating-toolbar{position:fixed;display:none;flex-direction:column;gap:6px;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(20,15,30,.25);padding:8px;z-index:3000;border:2px solid var(--card-border);width:236px;}
+.ft-swatch-row{display:flex;flex-wrap:wrap;gap:5px;}
+.ft-action-row{display:flex;align-items:center;gap:5px;border-top:2px solid var(--cream);padding-top:6px;}
+.ft-swatch{width:22px;height:22px;border-radius:7px;border:2px solid #fff;box-shadow:0 0 0 2px var(--card-border);flex-shrink:0;}
 .ft-swatch:hover{box-shadow:0 0 0 2px var(--ink-soft);}
-.ft-btn{width:28px;height:28px;border-radius:8px;background:var(--cream);color:var(--ink);display:flex;align-items:center;justify-content:center;}
+.ft-btn{width:26px;height:26px;border-radius:8px;background:var(--cream);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ft-btn:hover{background:var(--blue-bg);}
-.ft-clear{width:auto;padding:0 10px;font-size:11px;font-weight:800;color:var(--ink-soft);background:var(--cream);border-radius:8px;}
-.ft-size{width:auto;padding:0 8px;font-size:12px;font-weight:800;}
+.ft-btn.active-format{background:var(--navy);color:#fff;}
+.ft-clear{width:auto;padding:0 10px;font-size:11px;font-weight:800;color:var(--ink-soft);background:var(--cream);border-radius:8px;height:26px;margin-left:auto;}
+.ft-size{width:auto;padding:0 7px;font-size:12px;font-weight:800;}
 
 /* ---------- add slides modal ---------- */
 .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:16px;}
@@ -402,6 +433,7 @@ svg{display:block;}
       <input type="text" id="searchInput" placeholder="Search slides, topics or subjects">
       <div class="search-results" id="searchResults"></div>
     </div>
+    <button class="dark-toggle" id="darkModeToggle" title="Toggle dark mode"></button>
   </div>
 
   <div class="utility-bar">
@@ -534,14 +566,29 @@ svg{display:block;}
 
 <!-- Floating format toolbar for rich text selections -->
 <div class="floating-toolbar" id="floatingToolbar">
-  <button type="button" class="ft-swatch" style="background:#3a5ea7" data-applycolor="#3a5ea7" title="blue"></button>
-  <button type="button" class="ft-swatch" style="background:#e8799f" data-applycolor="#e8799f" title="pink"></button>
-  <button type="button" class="ft-swatch" style="background:#8a5fd6" data-applycolor="#8a5fd6" title="purple"></button>
-  <button type="button" class="ft-swatch" style="background:#4f9c6b" data-applycolor="#4f9c6b" title="green"></button>
-  <button type="button" class="ft-btn" id="ftStrikeBtn" title="Strikethrough"></button>
-  <button type="button" class="ft-btn ft-size" data-fontsize="down" title="Smaller text">A-</button>
-  <button type="button" class="ft-btn ft-size" data-fontsize="up" title="Bigger text">A+</button>
-  <button type="button" class="ft-clear" data-applycolor="clear">Clear</button>
+  <div class="ft-swatch-row">
+    <button type="button" class="ft-swatch" style="background:#3a5ea7" data-applycolor="#3a5ea7" title="navy blue"></button>
+    <button type="button" class="ft-swatch" style="background:#4a90c9" data-applycolor="#4a90c9" title="sky blue"></button>
+    <button type="button" class="ft-swatch" style="background:#2f9e93" data-applycolor="#2f9e93" title="teal"></button>
+    <button type="button" class="ft-swatch" style="background:#4f9c6b" data-applycolor="#4f9c6b" title="green"></button>
+    <button type="button" class="ft-swatch" style="background:#8ac926" data-applycolor="#8ac926" title="lime"></button>
+    <button type="button" class="ft-swatch" style="background:#d9a441" data-applycolor="#d9a441" title="gold"></button>
+    <button type="button" class="ft-swatch" style="background:#e8944a" data-applycolor="#e8944a" title="orange"></button>
+    <button type="button" class="ft-swatch" style="background:#e0576b" data-applycolor="#e0576b" title="red"></button>
+    <button type="button" class="ft-swatch" style="background:#e8799f" data-applycolor="#e8799f" title="pink"></button>
+    <button type="button" class="ft-swatch" style="background:#8a5fd6" data-applycolor="#8a5fd6" title="purple"></button>
+    <button type="button" class="ft-swatch" style="background:#6a4c93" data-applycolor="#6a4c93" title="plum"></button>
+    <button type="button" class="ft-swatch" style="background:#8d6e52" data-applycolor="#8d6e52" title="brown"></button>
+    <button type="button" class="ft-swatch" style="background:#33344a" data-applycolor="#33344a" title="black"></button>
+    <button type="button" class="ft-swatch" style="background:#6b6c85" data-applycolor="#6b6c85" title="grey"></button>
+  </div>
+  <div class="ft-action-row">
+    <button type="button" class="ft-btn" id="ftStrikeBtn" title="Strikethrough"></button>
+    <button type="button" class="ft-btn" id="ftUnderlineBtn" title="Underline"></button>
+    <button type="button" class="ft-btn ft-size" data-fontsize="down" title="Smaller text">A-</button>
+    <button type="button" class="ft-btn ft-size" data-fontsize="up" title="Bigger text">A+</button>
+    <button type="button" class="ft-clear" id="ftClearBtn">Clear</button>
+  </div>
 </div>
 
 <script>
@@ -572,10 +619,13 @@ function icon(name, size){
     chevronLeft: '<polyline points="15 18 9 12 15 6"/>',
     chevronRight: '<polyline points="9 18 15 12 9 6"/>',
     strike: '<path d="M6 4h8a3 3 0 0 1 2.5 4.5"/><path d="M18 20H8a3 3 0 0 1-2.7-4.4"/><line x1="3" y1="12" x2="21" y2="12"/>',
+    underline: '<path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/>',
     table: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>',
     copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
     chevronUp: '<polyline points="18 15 12 9 6 15"/>',
-    chevronDown: '<polyline points="6 9 12 15 18 9"/>'
+    chevronDown: '<polyline points="6 9 12 15 18 9"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>',
+    moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
   }[name] || '';
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
 }
@@ -599,12 +649,25 @@ var STARTER_BUNDLE = ["title","tryitout","rule","examples"];
 var TYPE_ORDER = Object.keys(TEMPLATES);
 var PAGE_SIZE = 9;
 var VALIGN_OPTIONS = [ { key:"center", label:"Centre" }, { key:"top", label:"Top" }, { key:"spread", label:"Fill space evenly" } ];
+var DEFAULT_BADGE_TEXT = { tryitout:"Try it out", rule:"Rule", examples:"Examples", wordlist:"Word list", list:"Key points", table:"Verb table", compare:"Comparison", flow:"Steps" };
 
 /* ---------------- persistence (Supabase, with local backup as fallback) ---------------- */
 var SUPABASE_URL = "https://gjgvatvqjdhjhpnbafbk.supabase.co";
 var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqZ3ZhdHZxamRoamhwbmJhZmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4ODkwNDgsImV4cCI6MjEwMTQ2NTA0OH0.ul1ZhwpWxhCYaFrvct4b1nsKZjvsuCSZXE_KSpajy40";
 var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var LOCAL_BACKUP_KEY = "okieSlideStudioLocalBackup";
+var DARK_MODE_KEY = "okieSlideStudioDarkMode";
+function initDarkMode(){
+  var saved = null;
+  try{ saved = localStorage.getItem(DARK_MODE_KEY); }catch(e){}
+  setDarkMode(saved === "1");
+}
+function setDarkMode(on){
+  document.body.classList.toggle("dark-mode", on);
+  var btn = document.getElementById("darkModeToggle");
+  if(btn) btn.innerHTML = icon(on ? "sun" : "moon", 17);
+  try{ localStorage.setItem(DARK_MODE_KEY, on ? "1" : "0"); }catch(e){}
+}
 
 var state = { subjects: [], topics: [], slides: [] };
 
@@ -627,6 +690,15 @@ function normalizeState(){
     if(!s.compareRows) s.compareRows = [ { label:"Row 1", cells:["",""] } ];
     if(!s.flowSteps) s.flowSteps = ["Step 1","Step 2","Step 3"];
     if(!s.notesItems) s.notesItems = [];
+    if(s.badgeText === undefined) s.badgeText = "";
+    ["title","subtitle"].forEach(function(k){
+      if(s[k] && s[k].indexOf("<") === -1){
+        s[k] = escapeHtml(s[k]).replace(/\n/g,"<br>");
+      }
+    });
+    if(s.imageZoom === undefined) s.imageZoom = 1;
+    if(s.imagePosX === undefined) s.imagePosX = 50;
+    if(s.imagePosY === undefined) s.imagePosY = 50;
   });
 }
 function isBlankRichSafe(html){
@@ -674,6 +746,7 @@ async function boot(){
   document.getElementById("searchIconSlot").innerHTML = icon("search",15);
   document.getElementById("backupBtn").innerHTML = icon("download",14) + " Backup";
   document.getElementById("restoreBtn").innerHTML = icon("upload",14) + " Restore";
+  initDarkMode();
   document.getElementById("bootLoading").classList.remove("hide");
   try{
     var remote = await fetchRemoteState();
@@ -741,7 +814,9 @@ function sanitizeRichHtml(html){
         }
         var styleParts = [];
         if(child.style && child.style.color) styleParts.push("color:" + child.style.color);
-        if(child.style && child.style.textDecoration && child.style.textDecoration.indexOf("line-through") > -1) styleParts.push("text-decoration:line-through");
+        if(child.style && child.style.textDecoration && child.style.textDecoration !== "none"){
+          styleParts.push("text-decoration:" + child.style.textDecoration);
+        }
         if(child.style && child.style.fontSize) styleParts.push("font-size:" + child.style.fontSize);
         Array.prototype.slice.call(child.attributes).forEach(function(attr){ child.removeAttribute(attr.name); });
         if(styleParts.length) child.setAttribute("style", styleParts.join(";"));
@@ -854,7 +929,12 @@ function renderMain(){
 
   var html = '<div class="slide-grid">';
   pageSlides.forEach(function(sl){
+    var posIndex = allSlides.indexOf(sl);
     html += '<div class="slide-card">' +
+      '<div class="slide-move-group">' +
+        '<button class="icon-btn move-btn" title="Move slide earlier" data-moveslide="' + sl.id + '" data-dir="up"' + (posIndex===0?' disabled':'') + '>' + icon("chevronUp",12) + '</button>' +
+        '<button class="icon-btn move-btn" title="Move slide later" data-moveslide="' + sl.id + '" data-dir="down"' + (posIndex===allSlides.length-1?' disabled':'') + '>' + icon("chevronDown",12) + '</button>' +
+      '</div>' +
       '<div class="card-actions">' +
         '<button class="icon-btn print-btn" title="Print this slide" data-printone="' + sl.id + '">' + icon("print",13) + '</button>' +
         '<button class="icon-btn dup-btn" title="Duplicate this slide" data-duplicate="' + sl.id + '">' + icon("copy",13) + '</button>' +
@@ -862,7 +942,7 @@ function renderMain(){
         '<button class="icon-btn del-btn" title="Delete" data-delslide="' + sl.id + '">' + icon("trash",13) + '</button>' +
       '</div>' +
       '<div class="slide-canvas theme-' + sl.color + '" data-view="' + sl.id + '">' + renderSlideInner(sl, topic) + '</div>' +
-      '<div class="card-foot"><span>' + (TEMPLATES[sl.template] ? TEMPLATES[sl.template].name : sl.template) + '</span></div>' +
+      '<div class="card-foot"><span>' + (TEMPLATES[sl.template] ? TEMPLATES[sl.template].name : sl.template) + '</span><span>' + (posIndex+1) + ' of ' + allSlides.length + '</span></div>' +
     '</div>';
   });
   html += '</div>';
@@ -898,21 +978,21 @@ function renderSlideInner(sl, topic){
   if(sl.template === "title"){
     return '<div class="slide-inner title-slide">' + chrome +
       '<div class="hero-card" style="margin:0 auto;width:100%;">' +
-      '<h1>' + nl2br(sl.title) + '</h1>' +
-      (sl.subtitle ? '<div class="subtitle">' + nl2br(sl.subtitle) + '</div>' : '') +
+      '<h1>' + sanitizeRichHtml(sl.title) + '</h1>' +
+      (sl.subtitle ? '<div class="subtitle">' + sanitizeRichHtml(sl.subtitle) + '</div>' : '') +
       '</div></div>';
   }
 
   if(sl.template === "tryitout"){
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Try it out</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Try it out") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="card-block ' + valignClass(sl) + '"><div class="card-text">' + sanitizeRichHtml(sl.tryItOut) + '</div></div></div>' +
       '</div>';
   }
 
   if(sl.template === "rule"){
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Rule</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Rule") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="card-block ' + valignClass(sl) + '"><div class="card-text">' + sanitizeRichHtml(sl.body) + '</div></div></div>' +
       '</div>';
   }
@@ -923,7 +1003,7 @@ function renderSlideInner(sl, topic){
       return '<div class="example-card"><div class="example-num">' + (i+1) + '</div><div class="example-text">' + sanitizeRichHtml(e) + '</div></div>';
     }).join("");
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Examples</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Examples") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="examples-row">' + exHtml + '</div></div>' +
       '</div>';
   }
@@ -932,21 +1012,22 @@ function renderSlideInner(sl, topic){
     var chips = sl.chips || [];
     var chipsHtml = chips.map(function(w){ return '<span class="chip-pill">' + escapeHtml(w) + '</span>'; }).join("");
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Word list</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Word list") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="chips-row">' + chipsHtml + '</div></div>' +
       '</div>';
   }
 
   if(sl.template === "imagetext"){
+    var imgStyle = 'object-position:' + (sl.imagePosX!==undefined?sl.imagePosX:50) + '% ' + (sl.imagePosY!==undefined?sl.imagePosY:50) + '%;transform:scale(' + (sl.imageZoom||1) + ');';
     var imgPart = sl.imageData ?
-      '<img src="' + sl.imageData + '" alt="">' :
+      '<div class="imgtext-frame"><img src="' + sl.imageData + '" alt="" style="' + imgStyle + '"></div>' :
       '<div class="imgtext-noimg">No image added</div>';
     var itemsArr = sl.items || [];
     var itemsHtml = itemsArr.length ?
       itemsArr.map(function(it){ return '<div class="imgtext-item">' + sanitizeRichHtml(it) + '</div>'; }).join("") :
       '<div class="card-text imgtext-empty-hint">Add points in the editor</div>';
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="imgtext-row">' + imgPart +
       '<div class="card-block imgtext-points ' + valignClass(sl) + '">' + itemsHtml + '</div></div></div>' +
       '</div>';
@@ -956,7 +1037,7 @@ function renderSlideInner(sl, topic){
     var bullets = sl.bullets || [];
     var lis = bullets.map(function(b){ return '<li><span class="dot"></span><span>' + sanitizeRichHtml(b) + '</span></li>'; }).join("");
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Key points</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Key points") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="card-block ' + valignClass(sl) + '"><ul class="bullet-list">' + lis + '</ul></div></div>' +
       '</div>';
   }
@@ -974,7 +1055,7 @@ function renderSlideInner(sl, topic){
     }).join("");
     var headHtml = '<div class="vt-head"><div class="vt-cell vt-form">Word</div><div class="vt-cell">Singular</div><div class="vt-cell">Plural</div><div class="vt-cell">Present</div><div class="vt-cell">Past</div></div>';
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Verb table</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Verb table") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="verb-table">' + headHtml + rowsHtml + '</div></div>' +
       '</div>';
   }
@@ -990,7 +1071,7 @@ function renderSlideInner(sl, topic){
         (r.cells||[]).map(function(v){ return '<div class="cmp-cell">' + escapeHtml(v) + '</div>'; }).join("") + '</div>';
     }).join("");
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Comparison</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Comparison") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="cmp-table">' + headHtml2 + rowsHtml2 + '</div></div>' +
       '</div>';
   }
@@ -1005,7 +1086,7 @@ function renderSlideInner(sl, topic){
       return box;
     }).join("");
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><div class="type-badge">Steps</div><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Steps") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone"><div class="flow-row">' + (flowHtml || '<div class="card-text imgtext-empty-hint">Add steps in the editor</div>') + '</div></div>' +
       '</div>';
   }
@@ -1016,17 +1097,24 @@ function renderSlideInner(sl, topic){
       notes.map(function(n){ return '<div class="card-block notes-card"><div class="card-text">' + sanitizeRichHtml(n) + '</div></div>'; }).join("") :
       '<div class="card-block va-center"><div class="card-text imgtext-empty-hint">Add note cards in the editor</div></div>';
     return '<div class="slide-inner">' + chrome +
-      '<div class="compact-header"><h2>' + nl2br(sl.title) + '</h2></div>' +
+      '<div class="compact-header"><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
       '<div class="content-zone notes-stack">' + notesHtml + '</div>' +
       '</div>';
   }
 
-  return '<div class="slide-inner">' + chrome + '<div class="compact-header"><h2>' + nl2br(sl.title || "Untitled") + '</h2></div></div>';
+  return '<div class="slide-inner">' + chrome + '<div class="compact-header"><h2>' + (sl.title ? sanitizeRichHtml(sl.title) : "Untitled") + '</h2></div></div>';
 }
 
 /* ---------------- modal helpers ---------------- */
 function openModal(id){ document.getElementById(id).classList.add("show"); }
-function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+function closeModal(id){
+  document.getElementById(id).classList.remove("show");
+  if(id === "editorModal"){
+    hideFloatingToolbar();
+    activeRichField = null;
+    savedRange = null;
+  }
+}
 
 /* ---------------- add slides (bulk creation) ---------------- */
 function openAddSlidesModal(){
@@ -1064,6 +1152,9 @@ function blankSlideOfType(key){
     examples: [],
     chips: [],
     imageData: "",
+    imageZoom: 1,
+    imagePosX: 50,
+    imagePosY: 50,
     items: [],
     bullets: [],
     tableRows: [],
@@ -1071,8 +1162,28 @@ function blankSlideOfType(key){
     compareCols: ["Column 1","Column 2"],
     compareRows: [ { label:"Row 1", cells:["",""] } ],
     flowSteps: ["Step 1","Step 2","Step 3"],
-    notesItems: []
+    notesItems: [],
+    badgeText: ""
   };
+}
+/* Moves a slide earlier/later among the slides belonging to the SAME topic.
+   state.slides is one flat array shared by every topic, so we look up the
+   slide immediately before/after it within its own topic's ordering, then
+   swap those two slides' positions in the underlying flat array. */
+function moveSlideWithinTopic(slideId, dir){
+  var slide = state.slides.filter(function(s){return s.id===slideId;})[0];
+  if(!slide) return;
+  var topicSlides = slidesFor(slide.topicId);
+  var idx = topicSlides.findIndex(function(s){return s.id===slideId;});
+  var targetIdx = dir === "up" ? idx - 1 : idx + 1;
+  if(targetIdx < 0 || targetIdx >= topicSlides.length) return;
+  var otherSlide = topicSlides[targetIdx];
+  var globalA = state.slides.indexOf(slide);
+  var globalB = state.slides.indexOf(otherSlide);
+  state.slides[globalA] = otherSlide;
+  state.slides[globalB] = slide;
+  saveState();
+  renderMain();
 }
 function createSlidesBatch(){
   if(!ui.addSlidesSelection.length) return;
@@ -1093,6 +1204,9 @@ function openEditorFor(template, existing){
   editorDraft = existing ? JSON.parse(JSON.stringify(existing)) : blankSlideOfType(template);
   ui.editingSlideId = existing ? existing.id : null;
   document.getElementById("editorHeading").textContent = existing ? "Edit slide" : "New slide";
+  hideFloatingToolbar();
+  activeRichField = null;
+  savedRange = null;
   renderEditorFields();
   renderEditorPreview();
   openModal("editorModal");
@@ -1108,15 +1222,15 @@ function renderEditorPreview(){
 function fieldsForTemplate(t){
   switch(t){
     case "title": return ["title","subtitle","color"];
-    case "tryitout": return ["title","tryItOut","valign","color"];
-    case "rule": return ["title","body","valign","color"];
-    case "examples": return ["title","examples","color"];
-    case "wordlist": return ["title","chips","color"];
+    case "tryitout": return ["title","badgeText","tryItOut","valign","color"];
+    case "rule": return ["title","badgeText","body","valign","color"];
+    case "examples": return ["title","badgeText","examples","color"];
+    case "wordlist": return ["title","badgeText","chips","color"];
     case "imagetext": return ["title","image","items","valign","color"];
-    case "list": return ["title","bullets","valign","color"];
-    case "table": return ["title","tableRows","color"];
-    case "compare": return ["title","compareTable","color"];
-    case "flow": return ["title","flowSteps","color"];
+    case "list": return ["title","badgeText","bullets","valign","color"];
+    case "table": return ["title","badgeText","tableRows","color"];
+    case "compare": return ["title","badgeText","compareTable","color"];
+    case "flow": return ["title","badgeText","flowSteps","color"];
     case "freenotes": return ["title","notesItems","color"];
     default: return ["title","color"];
   }
@@ -1186,12 +1300,10 @@ function renderEditorFields(){
   var html = "";
   flds.forEach(function(f){
     if(f === "title"){
-      html += '<div class="form-field"><label>Slide title</label>' +
-        '<textarea id="f_title" rows="1" class="autogrow-text" placeholder="e.g. Adjectives that show feelings">' + escapeHtml(editorDraft.title) + '</textarea>' +
-        '<div class="hint">Press enter to start a new line inside the title</div></div>';
+      html += '<div class="form-field"><label>Slide title</label>' + richField("title", null, "e.g. Adjectives that show feelings", editorDraft.title) +
+        '<div class="hint">Select text, then use the toolbar to colour or resize it. Enter makes a new line.</div></div>';
     } else if(f === "subtitle"){
-      html += '<div class="form-field"><label>Subtitle (optional)</label>' +
-        '<textarea id="f_subtitle" rows="1" class="autogrow-text" placeholder="A short line under the title">' + escapeHtml(editorDraft.subtitle) + '</textarea></div>';
+      html += '<div class="form-field"><label>Subtitle (optional)</label>' + richField("subtitle", null, "A short line under the title", editorDraft.subtitle) + '</div>';
     } else if(f === "tryItOut"){
       html += '<div class="form-field"><label>Try it out</label>' + richField("tryItOut", null, "An exposure question", editorDraft.tryItOut) +
         '<div class="hint">Select text, then use the toolbar to colour, strike or resize it. Enter makes a new line.</div></div>';
@@ -1202,6 +1314,9 @@ function renderEditorFields(){
       html += itemListField("examples", "Examples", "Type one example", "Add example");
     } else if(f === "chips"){
       html += renderChipsField();
+    } else if(f === "badgeText"){
+      html += '<div class="form-field"><label>Small label badge (optional)</label>' +
+        '<input type="text" id="f_badgetext" value="' + escapeHtml(editorDraft.badgeText || "") + '" placeholder="' + escapeHtml(DEFAULT_BADGE_TEXT[editorDraft.template] || "") + '"></div>';
     } else if(f === "items"){
       html += itemListField("items", "Points beside the picture", "Type one point", "Add point");
       html += '<div class="hint" style="margin-top:-8px;margin-bottom:14px;">Add as many points as you like, they will spread out to fill the space next to the picture</div>';
@@ -1227,7 +1342,16 @@ function renderEditorFields(){
         (editorDraft.imageData ? '<img id="f_imgpreview" src="' + editorDraft.imageData + '">' : '<span class="hint" id="f_imgpreviewempty">No image chosen</span>') +
         '<input type="file" id="f_image" accept="image/*">' +
         (editorDraft.imageData ? '<button type="button" class="btn btn-outline" id="f_imgremove">Remove</button>' : '') +
-        '</div></div>';
+        '</div>';
+      if(editorDraft.imageData){
+        html += '<div class="crop-controls">' +
+          '<div class="crop-row"><label>Zoom</label><input type="range" id="f_imgzoom" min="1" max="3" step="0.05" value="' + editorDraft.imageZoom + '"></div>' +
+          '<div class="crop-row"><label>Move left / right</label><input type="range" id="f_imgposx" min="0" max="100" step="1" value="' + editorDraft.imagePosX + '"></div>' +
+          '<div class="crop-row"><label>Move up / down</label><input type="range" id="f_imgposy" min="0" max="100" step="1" value="' + editorDraft.imagePosY + '"></div>' +
+          '<div class="hint">Zoom and drag the sliders to choose which part of the photo shows through the frame</div>' +
+        '</div>';
+      }
+      html += '</div>';
     } else if(f === "color"){
       html += '<div class="form-field"><label>Colour theme (slide background)</label><div class="theme-picker" id="f_colorpicker">' +
         THEMES.map(function(c){
@@ -1361,8 +1485,7 @@ function attachFieldListeners(){
       renderEditorPreview();
     });
   }
-  bindText("f_title","title");
-  bindText("f_subtitle","subtitle");
+  bindText("f_badgetext","badgeText");
 
   var valignWrap = document.getElementById("f_valign");
   if(valignWrap){
@@ -1400,6 +1523,9 @@ function attachFieldListeners(){
       var reader = new FileReader();
       reader.onload = function(){
         editorDraft.imageData = reader.result;
+        editorDraft.imageZoom = 1;
+        editorDraft.imagePosX = 50;
+        editorDraft.imagePosY = 50;
         renderEditorPreview();
         renderEditorFields();
       };
@@ -1410,10 +1536,24 @@ function attachFieldListeners(){
   if(imgRemove){
     imgRemove.addEventListener("click", function(){
       editorDraft.imageData = "";
+      editorDraft.imageZoom = 1;
+      editorDraft.imagePosX = 50;
+      editorDraft.imagePosY = 50;
       renderEditorPreview();
       renderEditorFields();
     });
   }
+  function bindRange(id, key, isFloat){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", function(){
+      editorDraft[key] = isFloat ? parseFloat(el.value) : parseInt(el.value,10);
+      renderEditorPreview();
+    });
+  }
+  bindRange("f_imgzoom","imageZoom",true);
+  bindRange("f_imgposx","imagePosX",false);
+  bindRange("f_imgposy","imagePosY",false);
 
   var chipInput = document.getElementById("f_chipinput");
   if(chipInput){
@@ -1478,6 +1618,7 @@ function syncRichField(el){
 var activeRichField = null;
 var savedRange = null;
 document.getElementById("ftStrikeBtn").innerHTML = icon("strike",14);
+document.getElementById("ftUnderlineBtn").innerHTML = icon("underline",14);
 
 document.addEventListener("selectionchange", function(){
   var editorEl = document.getElementById("editorModal");
@@ -1491,16 +1632,19 @@ document.addEventListener("selectionchange", function(){
   if(!richEl){ hideFloatingToolbar(); return; }
   activeRichField = richEl;
   savedRange = range.cloneRange();
-  var rect = range.getBoundingClientRect();
+  var rect;
+  try{ rect = range.getBoundingClientRect(); }catch(e){ hideFloatingToolbar(); return; }
+  if(!rect){ hideFloatingToolbar(); return; }
   if(rect.width === 0 && rect.height === 0){ hideFloatingToolbar(); return; }
   positionFloatingToolbar(rect);
 });
 function positionFloatingToolbar(rect){
   var tb = document.getElementById("floatingToolbar");
   tb.style.display = "flex";
-  var left = rect.left + rect.width/2 - 100;
-  left = Math.max(8, Math.min(left, window.innerWidth - 208));
-  var top = rect.top - 50;
+  var tbWidth = 236;
+  var left = rect.left + rect.width/2 - tbWidth/2;
+  left = Math.max(8, Math.min(left, window.innerWidth - tbWidth - 12));
+  var top = rect.top - 130;
   if(top < 8) top = rect.bottom + 10;
   tb.style.left = left + "px";
   tb.style.top = top + "px";
@@ -1521,32 +1665,112 @@ function nearestSizeStepIndex(em){
   });
   return best;
 }
-function applyFormatToSelection(styleObj){
-  if(!savedRange || savedRange.collapsed) return;
-  if(!activeRichField || !document.body.contains(activeRichField) || !activeRichField.contains(savedRange.commonAncestorContainer)) return;
-  var range = savedRange.cloneRange();
-  var span = document.createElement("span");
-  if(styleObj.color) span.style.color = styleObj.color;
-  if(styleObj.textDecoration) span.style.textDecoration = styleObj.textDecoration;
-  if(styleObj.fontSize) span.style.fontSize = styleObj.fontSize;
-  try{
-    span.appendChild(range.extractContents());
-    range.insertNode(span);
-  }catch(e){
-    return;
-  }
+function rangeIsUsable(){
+  return savedRange && !savedRange.collapsed && activeRichField &&
+    document.body.contains(activeRichField) && activeRichField.contains(savedRange.commonAncestorContainer);
+}
+function replaceSelectionWithNode(range, node){
+  range.insertNode(node);
+  unwrapEmptyAncestorSpans(node, activeRichField);
   var sel = window.getSelection();
   sel.removeAllRanges();
   var newRange = document.createRange();
-  newRange.selectNodeContents(span);
+  newRange.selectNodeContents(node);
   sel.addRange(newRange);
   savedRange = newRange.cloneRange();
+}
+/* If our newly inserted node ends up as the sole content of one or more
+   ancestor spans (this happens when the selection matched an existing
+   formatted span exactly), those ancestors are now empty wrappers doing
+   nothing useful, so we lift our node out of them to keep the markup tidy. */
+function unwrapEmptyAncestorSpans(node, root){
+  var parent = node.parentNode;
+  while(parent && parent !== root && parent.tagName === "SPAN"){
+    var hasOtherContent = false;
+    Array.prototype.forEach.call(parent.childNodes, function(c){
+      if(c === node) return;
+      if(c.nodeType === 3 && c.textContent.length) hasOtherContent = true;
+      else if(c.nodeType === 1) hasOtherContent = true;
+    });
+    if(hasOtherContent) break;
+    var grandparent = parent.parentNode;
+    if(!grandparent) break;
+    grandparent.insertBefore(node, parent);
+    grandparent.removeChild(parent);
+    parent = grandparent;
+  }
+}
+/* Applies one style property to the current selection. Any descendant
+   elements inside the selection that already set this same property have
+   that property cleared first, so the newly applied value actually takes
+   effect instead of being silently overridden by old nested formatting
+   (this is what made re-colouring previously-formatted text unreliable). */
+function applyFormatToSelection(styleObj){
+  if(!rangeIsUsable()) return;
+  var range = savedRange.cloneRange();
+  var frag;
+  try{ frag = range.extractContents(); }catch(e){ return; }
+  var props = Object.keys(styleObj);
+  var descendants = frag.querySelectorAll ? frag.querySelectorAll("*") : [];
+  Array.prototype.forEach.call(descendants, function(el){
+    props.forEach(function(p){
+      if(el.style && el.style[p]) el.style[p] = "";
+    });
+  });
+  var span = document.createElement("span");
+  if(styleObj.color) span.style.color = styleObj.color;
+  if(styleObj.textDecoration !== undefined) span.style.textDecoration = styleObj.textDecoration;
+  if(styleObj.fontSize) span.style.fontSize = styleObj.fontSize;
+  span.appendChild(frag);
+  replaceSelectionWithNode(range, span);
   syncRichField(activeRichField);
   hideFloatingToolbar();
 }
+/* Fully strips colour, strikethrough/underline and size from the selection,
+   flattening it back down to plain text (keeping line breaks). */
+function clearFormatting(){
+  if(!rangeIsUsable()) return;
+  var range = savedRange.cloneRange();
+  var frag;
+  try{ frag = range.extractContents(); }catch(e){ return; }
+  function flatten(node){
+    var out = document.createDocumentFragment();
+    Array.prototype.forEach.call(node.childNodes, function(child){
+      if(child.nodeType === 3){
+        out.appendChild(document.createTextNode(child.textContent));
+      } else if(child.nodeType === 1){
+        if(child.tagName === "BR"){ out.appendChild(document.createElement("br")); }
+        else { out.appendChild(flatten(child)); }
+      }
+    });
+    return out;
+  }
+  var wrapper = document.createElement("span");
+  wrapper.appendChild(flatten(frag));
+  replaceSelectionWithNode(range, wrapper);
+  syncRichField(activeRichField);
+  hideFloatingToolbar();
+}
+function currentDecorationSet(){
+  var set = { };
+  if(!savedRange) return set;
+  var container = savedRange.commonAncestorContainer;
+  var startEl = container.nodeType === 3 ? container.parentElement : container;
+  var wrappingSpan = startEl && startEl.closest ? startEl.closest("span[style*='text-decoration']") : null;
+  if(wrappingSpan && activeRichField && activeRichField.contains(wrappingSpan)){
+    (wrappingSpan.style.textDecoration || "").split(" ").forEach(function(p){ if(p && p !== "none") set[p] = true; });
+  }
+  return set;
+}
+function toggleDecoration(kind){
+  if(!rangeIsUsable()) return;
+  var current = currentDecorationSet();
+  if(current[kind]) delete current[kind]; else current[kind] = true;
+  var keys = Object.keys(current);
+  applyFormatToSelection({ textDecoration: keys.length ? keys.join(" ") : "none" });
+}
 function applyFontSizeStep(direction){
-  if(!savedRange || savedRange.collapsed) return;
-  if(!activeRichField || !document.body.contains(activeRichField) || !activeRichField.contains(savedRange.commonAncestorContainer)) return;
+  if(!rangeIsUsable()) return;
   var container = savedRange.commonAncestorContainer;
   var startEl = container.nodeType === 3 ? container.parentElement : container;
   var currentEm = 1;
@@ -1566,8 +1790,9 @@ function isBlankRich(html){
   return !d.textContent.trim();
 }
 function cleanBeforeSave(){
-  editorDraft.title = (editorDraft.title || "").replace(/\r\n/g,"\n");
-  editorDraft.subtitle = (editorDraft.subtitle || "").replace(/\r\n/g,"\n");
+  editorDraft.title = sanitizeRichHtml(editorDraft.title || "");
+  editorDraft.subtitle = sanitizeRichHtml(editorDraft.subtitle || "");
+  editorDraft.badgeText = (editorDraft.badgeText || "").trim();
   if(editorDraft.body !== undefined) editorDraft.body = sanitizeRichHtml(editorDraft.body);
   if(editorDraft.tryItOut !== undefined) editorDraft.tryItOut = sanitizeRichHtml(editorDraft.tryItOut);
   if(editorDraft.examples){
@@ -1597,7 +1822,7 @@ function cleanBeforeSave(){
 }
 
 function saveEditorSlide(){
-  if(!editorDraft.title || !editorDraft.title.trim()){
+  if(isBlankRich(editorDraft.title)){
     alert("Please give this slide a title before saving.");
     return;
   }
@@ -1772,19 +1997,26 @@ document.addEventListener("click", function(e){
        background. This stops a text selection drag that ends outside the
        modal box (e.g. while selecting a title) from accidentally closing it. */
     if(overlayMousedownTarget === t){
-      t.classList.remove("show");
+      closeModal(t.id);
     }
     return;
   }
 
-  var swatchEl = t.closest(".ft-swatch, .ft-clear");
+  var swatchEl = t.closest(".ft-swatch");
   if(swatchEl){
-    var col = swatchEl.getAttribute("data-applycolor");
-    applyFormatToSelection(col === "clear" ? { color:"var(--ink)", textDecoration:"none", fontSize:"1em" } : { color: col });
+    applyFormatToSelection({ color: swatchEl.getAttribute("data-applycolor") });
+    return;
+  }
+  if(t.closest("#ftClearBtn")){
+    clearFormatting();
     return;
   }
   if(t.closest("#ftStrikeBtn")){
-    applyFormatToSelection({ textDecoration: "line-through" });
+    toggleDecoration("line-through");
+    return;
+  }
+  if(t.closest("#ftUnderlineBtn")){
+    toggleDecoration("underline");
     return;
   }
   var fontSizeEl = t.closest("[data-fontsize]");
@@ -2023,6 +2255,14 @@ document.addEventListener("click", function(e){
     return;
   }
 
+  var moveSlideEl = t.closest("[data-moveslide]");
+  if(moveSlideEl && !moveSlideEl.disabled){
+    var msId = moveSlideEl.getAttribute("data-moveslide");
+    var msDir = moveSlideEl.getAttribute("data-dir");
+    moveSlideWithinTopic(msId, msDir);
+    return;
+  }
+
   var delSlideEl = t.closest("[data-delslide]");
   if(delSlideEl){
     var did = delSlideEl.getAttribute("data-delslide");
@@ -2104,6 +2344,7 @@ document.addEventListener("click", function(e){
   if(t.id === "backupBtn"){ downloadBackup(); return; }
   if(t.id === "restoreBtn"){ document.getElementById("restoreFileInput").click(); return; }
   if(t.id === "syncRetryBtn"){ boot(); return; }
+  if(t.id === "darkModeToggle"){ setDarkMode(!document.body.classList.contains("dark-mode")); return; }
 
   var jumpEl = t.closest("[data-jump]");
   if(jumpEl){
