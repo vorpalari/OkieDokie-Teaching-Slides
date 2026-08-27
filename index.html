@@ -25,7 +25,7 @@
   --shadow:0 8px 22px rgba(58,94,167,.10);
   --radius:18px;
 }
-*{box-sizing:border-box;}
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
 html,body{margin:0;padding:0;}
 body{
   font-family:'Nunito',sans-serif;
@@ -195,11 +195,14 @@ svg{display:block;}
 
 .compact-header{position:relative;z-index:2;flex-shrink:0;margin-bottom:3.4cqw;}
 .compact-header .eyebrow{font-size:2.1cqw;font-weight:800;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:1.2cqw;opacity:.85;}
-.type-badge{display:inline-block;background:var(--accent);color:#fff;font-family:'Fredoka One',sans-serif;font-size:2.3cqw;padding:.9cqw 2.8cqw;border-radius:20px;margin-bottom:1.4cqw;}
+.type-badge{display:inline-block;background:var(--accent);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:.02em;font-size:2.3cqw;padding:.9cqw 2.8cqw;border-radius:20px;margin-bottom:1.4cqw;}
 .compact-header h2{font-size:5cqw;color:var(--ink);line-height:1.16;overflow-wrap:break-word;word-break:break-word;}
 
 .content-zone{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;gap:2.2cqw;overflow:hidden;min-height:0;}
 .card-block{background:#fff;border-radius:3cqw;padding:3.6cqw 4.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);border-left:.9cqw solid var(--accent);flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.card-block.rule-card{background:linear-gradient(145deg, #ffffff 0%, var(--bg) 145%);}
+.rule-icon-badge{width:9cqw;height:9cqw;min-width:9cqw;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:2.6cqw;box-shadow:0 .6cqw 1.4cqw rgba(35,25,55,.16);flex-shrink:0;}
+.rule-icon-badge svg{width:55%;height:55%;display:block;}
 .card-block .card-text{font-size:3.4cqw;font-weight:700;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;max-width:100%;}
 
 .examples-row{display:flex;flex-direction:column;gap:1.7cqw;flex:1;overflow:hidden;justify-content:center;}
@@ -227,11 +230,11 @@ svg{display:block;}
 /* verb table */
 .verb-table{width:100%;flex:1;display:flex;flex-direction:column;border-radius:3cqw;overflow:hidden;background:#fff;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);}
 .vt-head{display:flex;flex-direction:row;background:var(--accent);flex-shrink:0;}
-.vt-head .vt-cell{color:#fff;font-family:'Fredoka One',sans-serif;font-size:2.4cqw;}
+.vt-head .vt-cell{color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:2.4cqw;}
 .vt-row{display:flex;flex-direction:row;flex:1;align-items:stretch;border-bottom:.25cqw solid var(--cream);}
 .vt-row:last-child{border-bottom:none;}
 .vt-cell{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:1.4cqw .6cqw;font-size:2.9cqw;font-weight:800;color:var(--ink);}
-.vt-cell.vt-form{flex:1.3 1 0;font-family:'Fredoka One',sans-serif;color:var(--accent);justify-content:flex-start;text-align:left;padding-left:3cqw;}
+.vt-cell.vt-form{flex:1.3 1 0;font-family:'Nunito',sans-serif;font-weight:800;color:var(--accent);justify-content:flex-start;text-align:left;padding-left:3cqw;}
 .vt-cell.vt-note{flex:4 1 0;justify-content:flex-start;text-align:left;padding-left:2cqw;font-size:2.4cqw;font-weight:700;color:var(--ink-soft);}
 .vt-tick{color:var(--accent);width:3.6cqw;height:3.6cqw;display:block;}
 .vt-tick svg{width:100%;height:100%;display:block;}
@@ -257,9 +260,9 @@ svg{display:block;}
 .cmp-cell{display:flex;align-items:center;justify-content:center;text-align:center;padding:1.6cqw 1.2cqw;font-size:2.7cqw;font-weight:700;color:var(--ink);border-bottom:.2cqw solid var(--cream);border-right:.2cqw solid var(--cream);word-break:break-word;}
 .cmp-row:last-child .cmp-cell{border-bottom:none;}
 .cmp-cell:last-child{border-right:none;}
-.cmp-cell.cmp-colhead{color:#fff;font-family:'Fredoka One',sans-serif;font-size:2.6cqw;border-color:rgba(255,255,255,.25);}
+.cmp-cell.cmp-colhead{color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:2.6cqw;border-color:rgba(255,255,255,.25);}
 .cmp-cell.cmp-corner{background:transparent;}
-.cmp-cell.cmp-rowhead{font-family:'Fredoka One',sans-serif;color:var(--accent);justify-content:flex-start;text-align:left;background:var(--bg);}
+.cmp-cell.cmp-rowhead{font-family:'Nunito',sans-serif;font-weight:800;color:var(--accent);justify-content:flex-start;text-align:left;background:var(--bg);}
 
 /* flow / arrows */
 .flow-row{display:flex;flex:1;align-items:center;justify-content:center;flex-wrap:wrap;gap:1.4cqw;}
@@ -271,6 +274,23 @@ svg{display:block;}
 /* stacked notes, share space evenly so more cards fill more of the slide */
 .notes-stack{display:flex;flex-direction:column;gap:2cqw;}
 .notes-card{flex:1;}
+
+/* side by side passages (e.g. formal vs informal writing) */
+.duotext-row{display:flex;gap:3cqw;flex:1;min-height:0;}
+.duotext-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.4cqw;}
+.duotext-label{align-self:flex-start;background:var(--accent);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:2.4cqw;padding:.9cqw 2.6cqw;border-radius:20px;flex-shrink:0;}
+.duotext-label-alt{background:var(--ink);opacity:.85;}
+.duotext-box{background:#fff;border-radius:2.6cqw;padding:3cqw 3.2cqw;box-shadow:0 1cqw 2cqw rgba(35,25,55,.06);flex:1;overflow:hidden;min-height:0;}
+.duotext-text{font-size:2.6cqw;font-weight:600;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;}
+
+/* photos-only slide */
+.photos-grid{display:grid;gap:2cqw;flex:1;min-height:0;}
+.photos-grid.photos-count-1{grid-template-columns:1fr;}
+.photos-grid.photos-count-2{grid-template-columns:1fr 1fr;}
+.photos-grid.photos-count-3,.photos-grid.photos-count-4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+.photos-grid.photos-count-5,.photos-grid.photos-count-6{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;}
+.photo-frame{border-radius:3cqw;overflow:hidden;box-shadow:0 1cqw 2cqw rgba(35,25,55,.08);min-height:0;}
+.photo-frame img{width:100%;height:100%;object-fit:cover;display:block;}
 
 /* ---------- comparison table editor (inside the slide editor modal) ---------- */
 .compare-editor{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
@@ -316,6 +336,9 @@ svg{display:block;}
 .theme-swatch.green{background:var(--green-deep);}
 .theme-swatch.selected{border-color:var(--ink);}
 .img-upload-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.photos-editor-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.photo-editor-row{display:flex;align-items:center;gap:8px;}
+.photo-editor-thumb{width:70px;height:52px;object-fit:cover;border-radius:10px;border:2px solid var(--card-border);flex-shrink:0;}
 .img-upload-row img{width:90px;height:66px;object-fit:cover;border-radius:10px;border:2px solid var(--card-border);}
 .crop-controls{margin-top:12px;padding:12px 14px;background:var(--cream);border-radius:12px;}
 .crop-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
@@ -348,9 +371,9 @@ svg{display:block;}
 .table-rows-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
 .table-row-editor{border:2px solid var(--card-border);border-radius:12px;padding:10px 12px;}
 .table-row-editor .tre-top{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
-.table-row-editor .tre-top input[type=text]{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13.5px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--ink);}
+.table-row-editor .tre-top textarea.tre-form{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13.5px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--ink);min-height:40px;}
 .table-row-editor .tre-toggles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
-.table-row-editor .tre-note{width:100%;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--ink);}
+.table-row-editor .tre-note{width:100%;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--ink);min-height:40px;}
 .chip-input-row{display:flex;gap:8px;margin-bottom:10px;}
 .chip-input-row input{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--card-border);font-size:13.5px;font-weight:700;min-width:0;}
 .chip-list{display:flex;flex-wrap:wrap;gap:8px;}
@@ -642,7 +665,9 @@ var TEMPLATES = {
   table:     { icon:"table",     name:"Verb table",       desc:"A table with ticks for singular, plural, present and past tense" },
   compare:   { icon:"table",     name:"Comparison table", desc:"A free table with editable column and row names" },
   flow:      { icon:"list",      name:"Flow / arrows",    desc:"A sequence of steps joined by arrows" },
-  freenotes: { icon:"list",      name:"Stacked notes",    desc:"Add as many or as few note cards as you like, fills the space" }
+  freenotes: { icon:"list",      name:"Stacked notes",    desc:"Add as many or as few note cards as you like, fills the space" },
+  duotext:   { icon:"list",      name:"Side by side text", desc:"Two longer passages side by side, e.g. formal vs informal writing" },
+  photos:    { icon:"image",     name:"Photos",           desc:"Just pictures - add one or more images, no text needed" }
 };
 var DEFAULT_BUNDLE = [];
 var STARTER_BUNDLE = ["title","tryitout","rule","examples"];
@@ -691,6 +716,11 @@ function normalizeState(){
     if(!s.flowSteps) s.flowSteps = ["Step 1","Step 2","Step 3"];
     if(!s.notesItems) s.notesItems = [];
     if(s.badgeText === undefined) s.badgeText = "";
+    if(s.leftLabel === undefined) s.leftLabel = "Formal";
+    if(s.leftText === undefined) s.leftText = "";
+    if(s.rightLabel === undefined) s.rightLabel = "Informal";
+    if(s.rightText === undefined) s.rightText = "";
+    if(!s.photos) s.photos = [];
     ["title","subtitle"].forEach(function(k){
       if(s[k] && s[k].indexOf("<") === -1){
         s[k] = escapeHtml(s[k]).replace(/\n/g,"<br>");
@@ -993,7 +1023,10 @@ function renderSlideInner(sl, topic){
   if(sl.template === "rule"){
     return '<div class="slide-inner">' + chrome +
       '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Rule") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
-      '<div class="content-zone"><div class="card-block ' + valignClass(sl) + '"><div class="card-text">' + sanitizeRichHtml(sl.body) + '</div></div></div>' +
+      '<div class="content-zone"><div class="card-block rule-card ' + valignClass(sl) + '">' +
+        '<div class="rule-icon-badge">' + icon("lightbulb",20) + '</div>' +
+        '<div class="card-text">' + sanitizeRichHtml(sl.body) + '</div>' +
+      '</div></div>' +
       '</div>';
   }
 
@@ -1102,6 +1135,31 @@ function renderSlideInner(sl, topic){
       '</div>';
   }
 
+  if(sl.template === "duotext"){
+    var leftHtml = sl.leftText && !isBlankRichSafe(sl.leftText) ? sanitizeRichHtml(sl.leftText) : '<span class="imgtext-empty-hint">Add the passage in the editor</span>';
+    var rightHtml = sl.rightText && !isBlankRichSafe(sl.rightText) ? sanitizeRichHtml(sl.rightText) : '<span class="imgtext-empty-hint">Add the passage in the editor</span>';
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><div class="type-badge">' + escapeHtml(sl.badgeText && sl.badgeText.trim() ? sl.badgeText : "Comparison") + '</div><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
+      '<div class="content-zone"><div class="duotext-row">' +
+        '<div class="duotext-col"><div class="duotext-label">' + escapeHtml(sl.leftLabel || "Left") + '</div><div class="duotext-box"><div class="duotext-text">' + leftHtml + '</div></div></div>' +
+        '<div class="duotext-col"><div class="duotext-label duotext-label-alt">' + escapeHtml(sl.rightLabel || "Right") + '</div><div class="duotext-box"><div class="duotext-text">' + rightHtml + '</div></div></div>' +
+      '</div></div>' +
+      '</div>';
+  }
+
+  if(sl.template === "photos"){
+    var photos = sl.photos || [];
+    var photosHtml = photos.length ?
+      '<div class="photos-grid photos-count-' + Math.min(photos.length,6) + '">' +
+        photos.map(function(p){ return '<div class="photo-frame"><img src="' + p + '" alt=""></div>'; }).join("") +
+      '</div>' :
+      '<div class="card-block va-center"><div class="card-text imgtext-empty-hint">Add photos in the editor</div></div>';
+    return '<div class="slide-inner">' + chrome +
+      '<div class="compact-header"><h2>' + sanitizeRichHtml(sl.title) + '</h2></div>' +
+      '<div class="content-zone">' + photosHtml + '</div>' +
+      '</div>';
+  }
+
   return '<div class="slide-inner">' + chrome + '<div class="compact-header"><h2>' + (sl.title ? sanitizeRichHtml(sl.title) : "Untitled") + '</h2></div></div>';
 }
 
@@ -1139,7 +1197,7 @@ function renderTypeGrid(){
   createBtn.disabled = n===0;
 }
 function blankSlideOfType(key){
-  var placeholderTitles = { title:"New title slide", tryitout:"Try it out", rule:"New rule", examples:"Examples", wordlist:"Word list", imagetext:"New picture slide", list:"Key points", table:"Verb table", compare:"Comparison", flow:"Steps", freenotes:"Notes" };
+  var placeholderTitles = { title:"New title slide", tryitout:"Try it out", rule:"New rule", examples:"Examples", wordlist:"Word list", imagetext:"New picture slide", list:"Key points", table:"Verb table", compare:"Comparison", flow:"Steps", freenotes:"Notes", duotext:"Formal vs Informal", photos:"Photos" };
   return {
     id: uid("slide"),
     topicId: ui.topicId,
@@ -1163,7 +1221,12 @@ function blankSlideOfType(key){
     compareRows: [ { label:"Row 1", cells:["",""] } ],
     flowSteps: ["Step 1","Step 2","Step 3"],
     notesItems: [],
-    badgeText: ""
+    badgeText: "",
+    leftLabel: "Formal",
+    leftText: "",
+    rightLabel: "Informal",
+    rightText: "",
+    photos: []
   };
 }
 /* Moves a slide earlier/later among the slides belonging to the SAME topic.
@@ -1232,6 +1295,8 @@ function fieldsForTemplate(t){
     case "compare": return ["title","badgeText","compareTable","color"];
     case "flow": return ["title","badgeText","flowSteps","color"];
     case "freenotes": return ["title","notesItems","color"];
+    case "duotext": return ["title","badgeText","duotext","color"];
+    case "photos": return ["title","photosField","color"];
     default: return ["title","color"];
   }
 }
@@ -1277,7 +1342,7 @@ function renderTableRowsField(){
   rows.forEach(function(r,i){
     html += '<div class="table-row-editor" data-rowindex="' + i + '">' +
       '<div class="tre-top">' + moveArrowsHtml("tableRows", i, rows.length) +
-        '<input type="text" class="tre-form" data-rowfield="form" data-index="' + i + '" value="' + escapeHtml(r.form) + '" placeholder="e.g. Is">' +
+        '<textarea rows="1" class="tre-form autogrow-text" data-rowfield="form" data-index="' + i + '" placeholder="e.g. Is">' + escapeHtml(r.form) + '</textarea>' +
         '<button type="button" class="item-del" data-removerow="' + i + '" title="Remove">' + icon("trash",13) + '</button>' +
       '</div>' +
       '<div class="tre-toggles">' +
@@ -1286,11 +1351,11 @@ function renderTableRowsField(){
           return '<button type="button" class="pill level-chip' + sel + '" data-rowtoggle="' + key + '" data-index="' + i + '">' + toggleLabels[key] + '</button>';
         }).join('') +
       '</div>' +
-      '<input type="text" class="tre-note" data-rowfield="note" data-index="' + i + '" value="' + escapeHtml(r.note || '') + '" placeholder="Optional note instead of ticks, e.g. used after to, will, can">' +
+      '<textarea rows="1" class="tre-note autogrow-text" data-rowfield="note" data-index="' + i + '" placeholder="Optional note instead of ticks, e.g. used after to, will, can">' + escapeHtml(r.note || '') + '</textarea>' +
     '</div>';
   });
   html += '</div><button type="button" class="btn btn-outline btn-sm" id="addTableRowBtn">' + icon("plusCircle",14) + ' Add row</button>' +
-    '<div class="hint">Tick the columns that apply to each word. If you add a note, it replaces the ticks for that row.</div></div>';
+    '<div class="hint">Tick the columns that apply to each word. If you add a note, it replaces the ticks for that row. Enter makes a new line.</div></div>';
   return html;
 }
 
@@ -1325,6 +1390,16 @@ function renderEditorFields(){
     } else if(f === "notesItems"){
       html += itemListField("notesItems", "Note cards", "Type one note", "Add note card");
       html += '<div class="hint" style="margin-top:-8px;margin-bottom:14px;">Each note becomes its own card and they share the space evenly, add more cards to fill a slide that looks too empty</div>';
+    } else if(f === "duotext"){
+      html += '<div class="form-field"><label>Left column label</label>' +
+        '<input type="text" id="f_leftlabel" value="' + escapeHtml(editorDraft.leftLabel) + '" placeholder="e.g. Formal"></div>';
+      html += '<div class="form-field"><label>Left passage</label>' + richField("leftText", null, "Type or paste the first passage here", editorDraft.leftText) + '</div>';
+      html += '<div class="form-field"><label>Right column label</label>' +
+        '<input type="text" id="f_rightlabel" value="' + escapeHtml(editorDraft.rightLabel) + '" placeholder="e.g. Informal"></div>';
+      html += '<div class="form-field"><label>Right passage</label>' + richField("rightText", null, "Type or paste the second passage here", editorDraft.rightText) + '</div>';
+      html += '<div class="hint">Select text in either passage to colour, resize or strike it. Enter makes a new line.</div>';
+    } else if(f === "photosField"){
+      html += renderPhotosField();
     } else if(f === "tableRows"){
       html += renderTableRowsField();
     } else if(f === "compareTable"){
@@ -1379,7 +1454,7 @@ function renderCompareTableField(){
     html += '<div class="compare-editor-cell">' +
       '<button type="button" class="chip-move" data-movecol data-index="' + ci + '" data-dir="up" title="Move left"' + (ci===0?' disabled':'') + '>' + icon("chevronUp",10) + '</button>' +
       '<button type="button" class="chip-move" data-movecol data-index="' + ci + '" data-dir="down" title="Move right"' + (ci===cols.length-1?' disabled':'') + '>' + icon("chevronDown",10) + '</button>' +
-      '<input type="text" class="compare-col-input" data-colindex="' + ci + '" value="' + escapeHtml(c) + '" placeholder="Column name">' +
+      '<textarea rows="1" class="compare-col-input autogrow-text" data-colindex="' + ci + '" placeholder="Column name">' + escapeHtml(c) + '</textarea>' +
       (cols.length > 1 ? '<button type="button" class="item-del compare-del-col" data-delcol="' + ci + '" title="Remove column">' + icon("trash",12) + '</button>' : '') + '</div>';
   });
   html += '<button type="button" class="btn btn-outline btn-sm" id="addCompareColBtn">' + icon("plusCircle",13) + ' Column</button>';
@@ -1387,10 +1462,10 @@ function renderCompareTableField(){
   rows.forEach(function(r, ri){
     html += '<div class="compare-editor-row">';
     html += '<div class="compare-editor-corner">' + moveArrowsHtml("compareRows", ri, rows.length) +
-      '<input type="text" class="compare-row-input" data-rowindex="' + ri + '" value="' + escapeHtml(r.label) + '" placeholder="Row name">' +
+      '<textarea rows="1" class="compare-row-input autogrow-text" data-rowindex="' + ri + '" placeholder="Row name">' + escapeHtml(r.label) + '</textarea>' +
       (rows.length > 1 ? '<button type="button" class="item-del compare-del-row" data-delrow="' + ri + '" title="Remove row">' + icon("trash",12) + '</button>' : '') + '</div>';
     (r.cells || []).forEach(function(cellVal, ci){
-      html += '<div class="compare-editor-cell"><input type="text" class="compare-cell-input" data-rowindex="' + ri + '" data-colindex="' + ci + '" value="' + escapeHtml(cellVal) + '" placeholder="..."></div>';
+      html += '<div class="compare-editor-cell"><textarea rows="1" class="compare-cell-input autogrow-text" data-rowindex="' + ri + '" data-colindex="' + ci + '" placeholder="...">' + escapeHtml(cellVal) + '</textarea></div>';
     });
     html += '</div>';
   });
@@ -1399,12 +1474,29 @@ function renderCompareTableField(){
   html += '</div>';
   return html;
 }
+function renderPhotosField(){
+  var photos = editorDraft.photos || [];
+  var html = '<div class="form-field"><label>Photos</label>';
+  if(photos.length){
+    html += '<div class="photos-editor-list">';
+    photos.forEach(function(p, i){
+      html += '<div class="photo-editor-row">' + moveArrowsHtml("photos", i, photos.length) +
+        '<img src="' + p + '" class="photo-editor-thumb">' +
+        '<button type="button" class="item-del" data-removeitem="photos" data-index="' + i + '" title="Remove">' + icon("trash",13) + '</button>' +
+      '</div>';
+    });
+    html += '</div>';
+  }
+  html += '<input type="file" id="f_photosinput" accept="image/*" multiple>' +
+    '<div class="hint">Add as many photos as you like. Use the arrows to reorder them.</div></div>';
+  return html;
+}
 function renderFlowStepsField(){
   var steps = editorDraft.flowSteps || [];
   var html = '<div class="form-field"><label>Steps (shown joined by arrows, in this order)</label><div class="item-list" id="flowStepsList">';
   steps.forEach(function(s, i){
     html += '<div class="item-row">' + moveArrowsHtml("flowSteps", i, steps.length) +
-      '<input type="text" class="flow-step-input" data-index="' + i + '" value="' + escapeHtml(s) + '" placeholder="Step text">' +
+      '<textarea rows="1" class="flow-step-input autogrow-text" data-index="' + i + '" placeholder="Step text">' + escapeHtml(s) + '</textarea>' +
       '<button type="button" class="item-del" data-removeflowstep="' + i + '" title="Remove">' + icon("trash",13) + '</button></div>';
   });
   html += '</div><button type="button" class="btn btn-outline btn-sm" id="addFlowStepBtn">' + icon("plusCircle",14) + ' Add step</button>' +
@@ -1432,6 +1524,7 @@ function bindCompareTableInputs(){
     inp.addEventListener("input", function(){
       var ci = parseInt(inp.getAttribute("data-colindex"),10);
       editorDraft.compareCols[ci] = inp.value;
+      autoGrowTextarea(inp);
       renderEditorPreview();
     });
   });
@@ -1439,6 +1532,7 @@ function bindCompareTableInputs(){
     inp.addEventListener("input", function(){
       var ri = parseInt(inp.getAttribute("data-rowindex"),10);
       editorDraft.compareRows[ri].label = inp.value;
+      autoGrowTextarea(inp);
       renderEditorPreview();
     });
   });
@@ -1447,6 +1541,7 @@ function bindCompareTableInputs(){
       var ri = parseInt(inp.getAttribute("data-rowindex"),10);
       var ci = parseInt(inp.getAttribute("data-colindex"),10);
       editorDraft.compareRows[ri].cells[ci] = inp.value;
+      autoGrowTextarea(inp);
       renderEditorPreview();
     });
   });
@@ -1456,6 +1551,7 @@ function bindFlowStepInputs(){
     inp.addEventListener("input", function(){
       var i = parseInt(inp.getAttribute("data-index"),10);
       editorDraft.flowSteps[i] = inp.value;
+      autoGrowTextarea(inp);
       renderEditorPreview();
     });
   });
@@ -1467,6 +1563,7 @@ function bindTableRowInputs(){
       var field = inp.getAttribute("data-rowfield");
       if(!editorDraft.tableRows[idx]) return;
       editorDraft.tableRows[idx][field] = inp.value;
+      autoGrowTextarea(inp);
       renderEditorPreview();
     });
   });
@@ -1486,6 +1583,8 @@ function attachFieldListeners(){
     });
   }
   bindText("f_badgetext","badgeText");
+  bindText("f_leftlabel","leftLabel");
+  bindText("f_rightlabel","rightLabel");
 
   var valignWrap = document.getElementById("f_valign");
   if(valignWrap){
@@ -1530,6 +1629,30 @@ function attachFieldListeners(){
         renderEditorFields();
       };
       reader.readAsDataURL(file);
+    });
+  }
+  var photosInput = document.getElementById("f_photosinput");
+  if(photosInput){
+    photosInput.addEventListener("change", function(){
+      var files = Array.prototype.slice.call(photosInput.files || []);
+      if(!files.length) return;
+      var tooLarge = files.some(function(f){ return f.size > 4*1024*1024; });
+      if(tooLarge){
+        alert("One or more photos are quite large. Please choose images under 4MB each so they save smoothly.");
+      }
+      var okFiles = files.filter(function(f){ return f.size <= 4*1024*1024; });
+      var readers = okFiles.map(function(f){
+        return new Promise(function(resolve){
+          var reader = new FileReader();
+          reader.onload = function(){ resolve(reader.result); };
+          reader.readAsDataURL(f);
+        });
+      });
+      Promise.all(readers).then(function(results){
+        editorDraft.photos = (editorDraft.photos || []).concat(results);
+        renderEditorPreview();
+        renderEditorFields();
+      });
     });
   }
   var imgRemove = document.getElementById("f_imgremove");
@@ -1793,6 +1916,10 @@ function cleanBeforeSave(){
   editorDraft.title = sanitizeRichHtml(editorDraft.title || "");
   editorDraft.subtitle = sanitizeRichHtml(editorDraft.subtitle || "");
   editorDraft.badgeText = (editorDraft.badgeText || "").trim();
+  if(editorDraft.leftText !== undefined) editorDraft.leftText = sanitizeRichHtml(editorDraft.leftText);
+  if(editorDraft.rightText !== undefined) editorDraft.rightText = sanitizeRichHtml(editorDraft.rightText);
+  if(editorDraft.leftLabel !== undefined) editorDraft.leftLabel = editorDraft.leftLabel.trim();
+  if(editorDraft.rightLabel !== undefined) editorDraft.rightLabel = editorDraft.rightLabel.trim();
   if(editorDraft.body !== undefined) editorDraft.body = sanitizeRichHtml(editorDraft.body);
   if(editorDraft.tryItOut !== undefined) editorDraft.tryItOut = sanitizeRichHtml(editorDraft.tryItOut);
   if(editorDraft.examples){
@@ -1960,6 +2087,7 @@ function runSearch(query){
       (sl.notesItems||[]).join(" "), (sl.chips||[]).join(" "), (sl.flowSteps||[]).join(" "),
       (sl.compareCols||[]).join(" "),
       (sl.compareRows||[]).map(function(r){ return r.label + " " + (r.cells||[]).join(" "); }).join(" "),
+      sl.leftLabel, sl.leftText, sl.rightLabel, sl.rightText,
       topic.name, subject?subject.name:""
     ].join(" ").toLowerCase();
     if(haystack.indexOf(query) > -1){
